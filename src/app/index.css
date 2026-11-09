@@ -1,0 +1,85 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource/roboto-mono/latin-400.css';
+@import '@fontsource/roboto-mono/latin-500.css';
+@import '@fontsource/roboto-mono/latin-700.css';
+
+/* Só existe o tema escuro: as classes `dark:` do shadcn valem sempre. */
+@custom-variant dark (&:where(*));
+
+/* Só tema escuro (SPEC §13.1). Hex de origem ao lado de cada token. */
+:root {
+  color-scheme: dark;
+  --radius: 0.5rem;
+
+  --background: oklch(0.1673 0.0136 44.32); /* #140D0A */
+  --foreground: oklch(0.9596 0.0091 78.28); /* #F5F1EB */
+  --card: oklch(0.2173 0.0243 36.6); /* #241612 */
+  --card-foreground: oklch(0.9596 0.0091 78.28);
+  --popover: oklch(0.2173 0.0243 36.6);
+  --popover-foreground: oklch(0.9596 0.0091 78.28);
+  --primary: oklch(0.6948 0.1177 59.7); /* #D28A4C */
+  --primary-foreground: oklch(0.1673 0.0136 44.32); /* #140D0A */
+  --secondary: oklch(0.2754 0.0455 59.98); /* #38220F */
+  --secondary-foreground: oklch(0.9596 0.0091 78.28);
+  --muted: oklch(0.2173 0.0243 36.6);
+  --muted-foreground: oklch(0.6642 0.0167 54.81); /* #9C918A */
+  --accent: oklch(0.2754 0.0455 59.98); /* #38220F */
+  --accent-foreground: oklch(0.9596 0.0091 78.28);
+  --footer-band: oklch(0.2754 0.0455 59.98); /* #38220F */
+  --destructive: oklch(0.6362 0.1889 22.5); /* #E74E53 (SPEC: #E5484D, 4,48:1 no card) */
+  --border: oklch(0.3162 0.0449 58.26); /* #432C1A */
+  --input: oklch(0.3162 0.0449 58.26);
+  --ring: oklch(0.6948 0.1177 59.7);
+}
+
+@theme inline {
+  --font-mono: 'Roboto Mono', ui-monospace, monospace;
+  --font-sans: var(--font-mono);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-footer-band: var(--footer-band);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background font-mono text-foreground antialiased;
+  }
+}
