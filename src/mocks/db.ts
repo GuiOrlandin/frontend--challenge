@@ -3,13 +3,13 @@
  * Toda mudança passa por uma mutação daqui, que incrementa `version`, persiste e emite,
  * então REST e eventos de tempo real leem o mesmo estado.
  */
-import type { Nft, Order } from '@/shared/contracts'
+import type { Nft } from '@/shared/contracts'
 
-import { createSeed, type DbData, type SeedName } from './fixtures'
+import { createSeed, type DbData, type OrderRecord, type SeedName } from './fixtures'
 
 const DB_STORAGE_KEY = 'kurio-mock-db'
 /** Mudou a forma de `DbData`? Incremente: bancos antigos são descartados e voltam à seed. */
-export const DB_SCHEMA_VERSION = 3
+export const DB_SCHEMA_VERSION = 4
 
 interface Persisted {
   schemaVersion: number
@@ -19,7 +19,8 @@ interface Persisted {
 
 export interface DbEvents {
   nft: Nft
-  order: Order
+  /** Leva `userId`: o socket filtra por ele e manda só o `Order` público. */
+  order: OrderRecord
 }
 
 type Listener<T> = (payload: T) => void
@@ -87,7 +88,22 @@ export function createDb(storage: StorageLike | null) {
       return updated
     },
 
-    /** Conta, sessão, carrinho e Cotação (sem evento de tempo real): troca o estado e persiste. */
+    /** Cria (`version` 1) ou troca um Pedido incrementando `version`, persiste e emite. */
+    saveOrder(next: Omit<OrderRecord, 'version'>): OrderRecord {
+      const current = data.orders.find((o) => o.id === next.id)
+      const order: OrderRecord = { ...next, version: (current?.version ?? 0) + 1 }
+      data = {
+        ...data,
+        orders: current
+          ? data.orders.map((o) => (o.id === order.id ? order : o))
+          : [...data.orders, order],
+      }
+      persist()
+      emit('order', order)
+      return order
+    },
+
+    /** Conta, sessão, carrinho, Cotação e conexão (sem evento de tempo real): troca e persiste. */
     mutate(recipe: (current: Readonly<DbData>) => DbData): void {
       data = recipe(data)
       persist()

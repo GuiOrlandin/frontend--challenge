@@ -5,14 +5,16 @@ import {
   COUPONS,
   NETWORK_FEES,
   type CartRecord,
+  type ConnectionRecord,
   type CouponFixture,
+  type OrderRecord,
   type QuoteRecord,
 } from './commerce'
 import { createNfts } from './nfts'
 import { createUsers, type SessionRecord, type UserRecord } from './users'
 
 export { CATEGORIES, COLLECTIONS, NETWORK_LABELS } from './taxonomy'
-export type { CartRecord, QuoteRecord } from './commerce'
+export type { CartRecord, ConnectionRecord, OrderRecord, QuoteRecord } from './commerce'
 export type { SessionRecord, UserRecord } from './users'
 
 /** Relógio fixo da seed: o mesmo instante que os testes instalam com `page.clock`. */
@@ -34,8 +36,12 @@ export interface DbData {
   sessions: SessionRecord[]
   carts: CartRecord[]
   quotes: QuoteRecord[]
+  connections: ConnectionRecord[]
+  orders: OrderRecord[]
   /** Cenário `session-expired`: já derrubou a sessão uma vez (volta a `false` no reset). */
   scenarioSessionExpired: boolean
+  /** Cenário `wallet-disconnected`: já derrubou a conexão uma vez (volta a `false` no reset). */
+  scenarioWalletDropped: boolean
 }
 
 export function createSeed(name: SeedName): DbData {
@@ -51,6 +57,9 @@ export function createSeed(name: SeedName): DbData {
     sessions: [],
     carts: [],
     quotes: [],
+    connections: [],
+    orders: [],
     scenarioSessionExpired: false,
+    scenarioWalletDropped: false,
   }
 }

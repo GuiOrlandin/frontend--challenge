@@ -1,5 +1,14 @@
 /** Cupons, taxa de rede, carrinhos e Cotações (SPEC §7, §12.5). Regras em `rules/cart.ts`. */
-import type { Eth, IsoDate, Network, Quote } from '@/shared/contracts'
+import type {
+  Buyer,
+  CheckoutConnection,
+  Eth,
+  IsoDate,
+  Network,
+  Order,
+  Quote,
+  WalletProvider,
+} from '@/shared/contracts'
 
 export interface CouponFixture {
   code: string
@@ -40,4 +49,17 @@ export interface CartRecord {
 /** Cotação emitida, guardada para o pedido revalidar (SPEC §8.4). */
 export interface QuoteRecord extends Quote {
   userId: string
+}
+
+/** Conexão de carteira ativa: uma por Colecionador; conectar de novo derruba a anterior. */
+export interface ConnectionRecord extends CheckoutConnection {
+  userId: string
+}
+
+/** Pedido no banco: o `Order` público mais o que o mock precisa para replay e Recibo. */
+export interface OrderRecord extends Order {
+  userId: string
+  idempotencyKey: string
+  buyer: Buyer
+  provider: WalletProvider
 }

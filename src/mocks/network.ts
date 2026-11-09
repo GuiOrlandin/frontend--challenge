@@ -1,5 +1,5 @@
 /**
- * Condições de rede dos cenários (SPEC §12.3): latência, offline, 503, timeout e respostas
+ * Condições de rede dos cenários (SPEC §12.3): latência, offline, 503 e respostas
  * fora de ordem. É um handler na frente de todos os outros: espera, e então ou responde com a
  * falha, ou não responde nada e deixa o MSW seguir para o handler do recurso.
  */
@@ -74,10 +74,6 @@ export const networkHandler = http.all(api('/*'), async ({ request }) => {
         headers: { 'Retry-After': '1' },
       })
     }
-  }
-
-  if (network.hold && matches(request, network.hold.match)) {
-    await delay(network.hold.ms)
   }
 
   // Sem resposta: o MSW segue para o handler do recurso.

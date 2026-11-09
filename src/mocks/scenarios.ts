@@ -41,8 +41,6 @@ export interface NetworkProfile {
   offline?: boolean
   /** As primeiras `first` chamadas que casam respondem 503 `TEMPORARILY_UNAVAILABLE`. */
   unavailable?: { match: RequestMatch; first: number }
-  /** Segura a resposta por `ms` (passa do timeout de 10 s do Axios). */
-  hold?: { match: RequestMatch; ms: number }
   /** Chamadas que casam respondem na ordem inversa: a mais antiga depois da mais nova. */
   outOfOrder?: { match: RequestMatch }
 }
@@ -52,6 +50,7 @@ export type ScenarioBehavior =
   | { kind: 'payment-refused' }
   | { kind: 'wallet-rejected' }
   | { kind: 'wallet-disconnected' }
+  | { kind: 'order-timeout' }
   | { kind: 'price-change' }
   | { kind: 'sold-out' }
 
@@ -91,13 +90,8 @@ export const SCENARIOS: Record<ScenarioName, Scenario> = {
   'payment-refused': withBehavior('payment-refused'),
   'wallet-rejected': withBehavior('wallet-rejected'),
   'wallet-disconnected': withBehavior('wallet-disconnected'),
-  'order-timeout': {
-    ...base,
-    network: {
-      latency: DEFAULT_LATENCY,
-      hold: { match: { method: 'POST', path: '/orders' }, ms: 15_000 },
-    },
-  },
+  // O pedido é criado antes de segurar a resposta: o handler de pedidos lê o comportamento.
+  'order-timeout': withBehavior('order-timeout'),
   'price-change': withBehavior('price-change'),
   'sold-out': withBehavior('sold-out'),
 }
