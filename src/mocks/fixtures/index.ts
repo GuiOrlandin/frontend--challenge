@@ -1,11 +1,18 @@
 /** Seeds do banco simulado. Cada cenário parte de uma delas (SPEC §12.3). */
 import type { Eth, Network, Nft } from '@/shared/contracts'
 
-import { COUPONS, NETWORK_FEES, type CouponFixture } from './commerce'
+import {
+  COUPONS,
+  NETWORK_FEES,
+  type CartRecord,
+  type CouponFixture,
+  type QuoteRecord,
+} from './commerce'
 import { createNfts } from './nfts'
 import { createUsers, type SessionRecord, type UserRecord } from './users'
 
 export { CATEGORIES, COLLECTIONS, NETWORK_LABELS } from './taxonomy'
+export type { CartRecord, QuoteRecord } from './commerce'
 export type { SessionRecord, UserRecord } from './users'
 
 /** Relógio fixo da seed: o mesmo instante que os testes instalam com `page.clock`. */
@@ -25,6 +32,8 @@ export interface DbData {
   highlights: { heroIds: string[]; spotlightId: string }
   users: UserRecord[]
   sessions: SessionRecord[]
+  carts: CartRecord[]
+  quotes: QuoteRecord[]
   /** Cenário `session-expired`: já derrubou a sessão uma vez (volta a `false` no reset). */
   scenarioSessionExpired: boolean
 }
@@ -40,6 +49,8 @@ export function createSeed(name: SeedName): DbData {
     // Catálogo vazio: favoritos apontariam para Nfts inexistentes.
     users: createUsers().map((user) => (name === 'empty' ? { ...user, favoriteNftIds: [] } : user)),
     sessions: [],
+    carts: [],
+    quotes: [],
     scenarioSessionExpired: false,
   }
 }

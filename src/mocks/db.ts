@@ -9,7 +9,7 @@ import { createSeed, type DbData, type SeedName } from './fixtures'
 
 const DB_STORAGE_KEY = 'kurio-mock-db'
 /** Mudou a forma de `DbData`? Incremente: bancos antigos são descartados e voltam à seed. */
-export const DB_SCHEMA_VERSION = 2
+export const DB_SCHEMA_VERSION = 3
 
 interface Persisted {
   schemaVersion: number
@@ -87,7 +87,7 @@ export function createDb(storage: StorageLike | null) {
       return updated
     },
 
-    /** Conta e sessão (sem evento de tempo real): troca o estado e persiste. */
+    /** Conta, sessão, carrinho e Cotação (sem evento de tempo real): troca o estado e persiste. */
     mutate(recipe: (current: Readonly<DbData>) => DbData): void {
       data = recipe(data)
       persist()

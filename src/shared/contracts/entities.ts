@@ -180,6 +180,7 @@ export interface Quote {
   discount: Eth
   networkFee: Eth
   total: Eth
+  notices?: CartNotice[]
 }
 
 export interface CheckoutConnection {

@@ -1,5 +1,5 @@
-/** Cupons e taxa de rede (SPEC §7, §12.5). As regras de aplicação ficam na task do carrinho. */
-import type { Eth, Network } from '@/shared/contracts'
+/** Cupons, taxa de rede, carrinhos e Cotações (SPEC §7, §12.5). Regras em `rules/cart.ts`. */
+import type { Eth, IsoDate, Network, Quote } from '@/shared/contracts'
 
 export interface CouponFixture {
   code: string
@@ -8,6 +8,8 @@ export interface CouponFixture {
   expired: boolean
   /** `RELAMPAGO`: válido ao aplicar, mas expira no meio do checkout. */
   flash: boolean
+  /** Primeira aplicação em qualquer carrinho: início da janela do `RELAMPAGO`. */
+  firstAppliedAt?: IsoDate
 }
 
 export const COUPONS: CouponFixture[] = [
@@ -21,4 +23,21 @@ export const NETWORK_FEES: Record<Network, Eth> = {
   ethereum: '0.0042',
   polygon: '0.0006',
   solana: '0.0003',
+}
+
+/** Carrinho no banco: só as quantidades; preço e disponibilidade vêm do Nft atual (SPEC §7). */
+export interface CartRecord {
+  id: string
+  /** Dono do carrinho da conta; ausente no carrinho de Visitante. */
+  userId?: string
+  /** `X-Cart-Token` do Visitante. */
+  token?: string
+  version: number
+  lines: { lineId: string; nftId: string; editionId: string; quantity: number }[]
+  coupon: { code: string; appliedAt: IsoDate } | null
+}
+
+/** Cotação emitida, guardada para o pedido revalidar (SPEC §8.4). */
+export interface QuoteRecord extends Quote {
+  userId: string
 }
