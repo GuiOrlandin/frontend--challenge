@@ -17,6 +17,7 @@
     "format": "pnpm prettier --write",
     "format:check": "pnpm prettier --check",
     "test:unit": "vitest run --passWithNoTests",
+    "images": "node scripts/optimize-images.mjs",
     "prettier": "prettier \"src/**/*.{ts,tsx,css}\" vite.config.ts eslint.config.js index.html \"tsconfig*.json\" package.json .prettierrc.json"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
+    "msw": "~2.15.0",
     "radix-ui": "^1.8.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -50,10 +52,16 @@
     "globals": "^17.14.0",
     "prettier": "^3.9.10",
     "shadcn": "4.23.0",
+    "sharp": "^0.35.5",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.6",
     "vite-plugin-svgr": "^5.2.0",
     "vitest": "^5.1.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

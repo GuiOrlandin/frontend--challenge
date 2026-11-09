@@ -9,8 +9,11 @@ import { ApiError, isApiError, type ApiErrorEnvelope } from '@/shared/contracts'
 
 import { tokenStore } from './tokenStore'
 
+/** Base da API REST: `VITE_API_URL` ou `/api`. O mock usa a mesma. */
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+
 export const http = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: API_BASE_URL,
   timeout: 10_000,
 })
 

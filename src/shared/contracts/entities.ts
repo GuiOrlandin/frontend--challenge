@@ -66,7 +66,8 @@ export interface Facets {
 
 export interface Highlights {
   hero: Nft[]
-  spotlight: Nft
+  /** `null` com o catálogo vazio. */
+  spotlight: Nft | null
 }
 
 export interface FavoriteIds {

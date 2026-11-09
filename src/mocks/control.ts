@@ -1,0 +1,80 @@
+/**
+ * Seleção de cenário e `window.__mock` (SPEC §12.4). Só existe com os mocks ligados.
+ * As tasks seguintes acrescentam `emit`, `dropSocket` e `expireSession`.
+ */
+import type { Nft } from '@/shared/contracts'
+
+import { db, type NftPatch } from './db'
+import { resetNetworkState } from './network'
+import {
+  getActiveScenario,
+  isScenarioName,
+  readStoredScenario,
+  SCENARIOS,
+  setActiveScenario,
+  type ScenarioName,
+} from './scenarios'
+
+/** Troca de cenário: sempre volta à seed dele. */
+function switchScenario(name: ScenarioName) {
+  setActiveScenario(name)
+  resetNetworkState()
+  db.reset(SCENARIOS[name].seed)
+}
+
+function resetCurrent() {
+  resetNetworkState()
+  db.reset(SCENARIOS[getActiveScenario().name].seed)
+}
+
+/**
+ * Aplica `?scenario=` e `?reset=1` e remove os dois da URL. Sem parâmetro, retoma o cenário
+ * e o banco guardados. Cenário desconhecido é ignorado com aviso.
+ */
+export function applyScenarioFromUrl(location: Location, history: History) {
+  const url = new URL(location.href)
+  const requested = url.searchParams.get('scenario')
+  const reset = url.searchParams.get('reset') === '1'
+  const stored = readStoredScenario() ?? 'default'
+
+  if (requested !== null && !isScenarioName(requested)) {
+    console.warn(`[mock] cenário desconhecido: "${requested}". Mantendo "${stored}".`)
+  }
+
+  if (isScenarioName(requested) && requested !== stored) {
+    switchScenario(requested)
+  } else {
+    setActiveScenario(stored)
+    db.load(SCENARIOS[stored].seed)
+    if (reset) resetCurrent()
+  }
+
+  if (url.searchParams.has('scenario') || url.searchParams.has('reset')) {
+    url.searchParams.delete('scenario')
+    url.searchParams.delete('reset')
+    history.replaceState(history.state, '', url)
+  }
+}
+
+export interface MockControl {
+  /** Cenário atual (sem argumento) ou troca de cenário, resetando o banco para a seed dele. */
+  scenario(name?: ScenarioName): ScenarioName
+  /** Volta o banco à seed do cenário atual. */
+  reset(): void
+  /** Muda um Nft como o "servidor" faria: incrementa `version`, persiste e emite. */
+  updateNft(id: string, patch: NftPatch): Nft
+}
+
+export function installMockControl(target: Window & { __mock?: MockControl }) {
+  target.__mock = {
+    scenario(name) {
+      if (name !== undefined) {
+        if (!isScenarioName(name)) throw new Error(`Cenário desconhecido: ${String(name)}`)
+        switchScenario(name)
+      }
+      return getActiveScenario().name
+    },
+    reset: resetCurrent,
+    updateNft: (id, patch) => db.updateNft(id, patch),
+  }
+}
