@@ -1,0 +1,18 @@
+node_modules
+dist
+*.local
+.env
+*.tsbuildinfo
+
+# Testes e auditoria
+test-results
+playwright-report
+blob-report
+.lighthouseci
+
+# Editor e sistema
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
