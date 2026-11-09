@@ -1,11 +1,9 @@
-/**
- * Seleção de cenário e `window.__mock` (SPEC §12.4). Só existe com os mocks ligados.
- * As tasks seguintes acrescentam `emit` e `dropSocket`.
- */
-import type { Nft } from '@/shared/contracts'
+/** Seleção de cenário e `window.__mock` (SPEC §12.4). Só existe com os mocks ligados. */
+import type { Nft, RealtimeEvent } from '@/shared/contracts'
 
 import { db, type NftPatch } from './db'
 import { resetNetworkState } from './network'
+import { resetScenarioEvents } from './scenarioEvents'
 import { expireSessions } from './session'
 import {
   getActiveScenario,
@@ -15,16 +13,19 @@ import {
   setActiveScenario,
   type ScenarioName,
 } from './scenarios'
+import { dropSockets, emitRealtime } from './ws'
 
 /** Troca de cenário: sempre volta à seed dele. */
 function switchScenario(name: ScenarioName) {
   setActiveScenario(name)
   resetNetworkState()
+  resetScenarioEvents()
   db.reset(SCENARIOS[name].seed)
 }
 
 function resetCurrent() {
   resetNetworkState()
+  resetScenarioEvents()
   db.reset(SCENARIOS[getActiveScenario().name].seed)
 }
 
@@ -66,6 +67,10 @@ export interface MockControl {
   updateNft(id: string, patch: NftPatch): Nft
   /** Vence todas as sessões: a próxima chamada privada responde 401 `SESSION_EXPIRED`. */
   expireSession(): void
+  /** Entrega um evento como veio (inclusive duplicado ou antigo), respeitando o escopo. */
+  emit(event: RealtimeEvent): void
+  /** Derruba as conexões Socket.IO; o cliente reconecta sozinho. */
+  dropSocket(): void
 }
 
 export function installMockControl(target: Window & { __mock?: MockControl }) {
@@ -80,5 +85,7 @@ export function installMockControl(target: Window & { __mock?: MockControl }) {
     reset: resetCurrent,
     updateNft: (id, patch) => db.updateNft(id, patch),
     expireSession: expireSessions,
+    emit: emitRealtime,
+    dropSocket: dropSockets,
   }
 }

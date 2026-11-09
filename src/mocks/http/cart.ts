@@ -17,6 +17,7 @@ import {
 import { db } from '../db'
 import { api, apiError, readJson, validate } from '../respond'
 import { couponState, mergeLines } from '../rules/cart'
+import { onScreenOpened } from '../scenarioEvents'
 import { requireUser } from '../session'
 
 const quantity = z.number().int().min(1, 'Use ao menos 1')
@@ -34,7 +35,9 @@ const lineNotFound = () => apiError(404, 'NOT_FOUND', 'Linha do carrinho não en
 export const cartHandlers = [
   http.get(api('/cart'), ({ request }) => {
     const resolved = resolveCart(request)
-    return resolved instanceof Response ? resolved : cartResponse(resolved.cart, resolved)
+    if (resolved instanceof Response) return resolved
+    onScreenOpened('cart', resolved.cart)
+    return cartResponse(resolved.cart, resolved)
   }),
 
   // Soma se a linha existe; não é otimista no cliente: o 409 volta antes de gravar.

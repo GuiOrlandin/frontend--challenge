@@ -20,5 +20,11 @@ export default defineConfig({
   test: {
     include: ['src/**/*.test.{ts,tsx}'],
     environment: 'node',
+    alias: {
+      // Bundle de browser: usa o `WebSocket` global, que o MSW intercepta (o de Node usa `ws`).
+      'socket.io-client': fileURLToPath(
+        new URL('./node_modules/socket.io-client/dist/socket.io.esm.min.js', import.meta.url),
+      ),
+    },
   },
 })

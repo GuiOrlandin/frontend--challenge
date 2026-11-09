@@ -8,6 +8,7 @@ import { couponOf, dropExpiredCoupon, toCartLines, userCart } from '../cart'
 import { db } from '../db'
 import { api, apiError, readJson, validate } from '../respond'
 import { priceLines } from '../rules/cart'
+import { onScreenOpened } from '../scenarioEvents'
 import { requireUser } from '../session'
 
 const QUOTE_TTL_MS = 10 * 60 * 1000
@@ -76,6 +77,9 @@ export const quoteHandlers = [
     const input = validate(quoteSchema, await readJson(request))
     if (input instanceof Response) return input
     const quote = createQuote(user.id, input.network)
-    return quote instanceof Response ? quote : HttpResponse.json<Quote>(quote)
+    if (quote instanceof Response) return quote
+    // Entrar na revisão: a tela não tem `GET`, então o `POST /quotes` é o gatilho.
+    onScreenOpened('review', userCart(user.id))
+    return HttpResponse.json<Quote>(quote)
   }),
 ]

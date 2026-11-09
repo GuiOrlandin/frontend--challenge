@@ -4,9 +4,14 @@ import { setupWorker } from 'msw/browser'
 import { applyScenarioFromUrl, installMockControl } from './control'
 import { httpHandlers } from './http'
 import { networkHandler } from './network'
+import { createSocketHandler } from './ws'
 
 // O handler de rede vem primeiro: aplica latência e falhas, depois cede ao do recurso.
-const worker = setupWorker(networkHandler, ...httpHandlers)
+const worker = setupWorker(
+  networkHandler,
+  ...httpHandlers,
+  createSocketHandler(new URL(import.meta.env.VITE_SOCKET_URL || window.location.origin).origin),
+)
 
 export async function startMocking() {
   applyScenarioFromUrl(window.location, window.history)
