@@ -1,11 +1,12 @@
 /**
  * Seleção de cenário e `window.__mock` (SPEC §12.4). Só existe com os mocks ligados.
- * As tasks seguintes acrescentam `emit`, `dropSocket` e `expireSession`.
+ * As tasks seguintes acrescentam `emit` e `dropSocket`.
  */
 import type { Nft } from '@/shared/contracts'
 
 import { db, type NftPatch } from './db'
 import { resetNetworkState } from './network'
+import { expireSessions } from './session'
 import {
   getActiveScenario,
   isScenarioName,
@@ -63,6 +64,8 @@ export interface MockControl {
   reset(): void
   /** Muda um Nft como o "servidor" faria: incrementa `version`, persiste e emite. */
   updateNft(id: string, patch: NftPatch): Nft
+  /** Vence todas as sessões: a próxima chamada privada responde 401 `SESSION_EXPIRED`. */
+  expireSession(): void
 }
 
 export function installMockControl(target: Window & { __mock?: MockControl }) {
@@ -76,5 +79,6 @@ export function installMockControl(target: Window & { __mock?: MockControl }) {
     },
     reset: resetCurrent,
     updateNft: (id, patch) => db.updateNft(id, patch),
+    expireSession: expireSessions,
   }
 }

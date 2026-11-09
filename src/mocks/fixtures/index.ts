@@ -3,8 +3,10 @@ import type { Eth, Network, Nft } from '@/shared/contracts'
 
 import { COUPONS, NETWORK_FEES, type CouponFixture } from './commerce'
 import { createNfts } from './nfts'
+import { createUsers, type SessionRecord, type UserRecord } from './users'
 
 export { CATEGORIES, COLLECTIONS, NETWORK_LABELS } from './taxonomy'
+export type { SessionRecord, UserRecord } from './users'
 
 /** Relógio fixo da seed: o mesmo instante que os testes instalam com `page.clock`. */
 export const SEED_NOW = '2026-07-29T12:00:00.000Z'
@@ -21,6 +23,10 @@ export interface DbData {
   networkFees: Record<Network, Eth>
   /** Ids do hero e do destaque da Início; os textos do hero ficam no código da UI. */
   highlights: { heroIds: string[]; spotlightId: string }
+  users: UserRecord[]
+  sessions: SessionRecord[]
+  /** Cenário `session-expired`: já derrubou a sessão uma vez (volta a `false` no reset). */
+  scenarioSessionExpired: boolean
 }
 
 export function createSeed(name: SeedName): DbData {
@@ -31,5 +37,9 @@ export function createSeed(name: SeedName): DbData {
     highlights: { heroIds: ['nft_001', 'nft_003', 'nft_007'], spotlightId: 'nft_002' },
     coupons: COUPONS.map((coupon) => ({ ...coupon })),
     networkFees: { ...NETWORK_FEES },
+    // Catálogo vazio: favoritos apontariam para Nfts inexistentes.
+    users: createUsers().map((user) => (name === 'empty' ? { ...user, favoriteNftIds: [] } : user)),
+    sessions: [],
+    scenarioSessionExpired: false,
   }
 }
