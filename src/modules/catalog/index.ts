@@ -1,2 +1,2 @@
 // API pública do módulo catalog. Outros módulos importam só daqui.
-export {}
+export { HomePage } from './pages/HomePage'

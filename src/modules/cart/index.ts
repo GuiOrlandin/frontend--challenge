@@ -1,2 +1,2 @@
 // API pública do módulo cart. Outros módulos importam só daqui.
-export {}
+export { CartPage } from './pages/CartPage'

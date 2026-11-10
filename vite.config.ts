@@ -1,12 +1,15 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import tailwindcss from '@tailwindcss/vite'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [
+    // Antes do React (SPEC §4.1).
+    tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     react(),
     tailwindcss(),
     // Ícones como componente (`?react`), decorativos por padrão.
