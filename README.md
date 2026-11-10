@@ -1,262 +1,167 @@
-# Desafio Frontend — Marketplace de NFTs
+# Kurio — Marketplace de NFTs
 
-Implemente o **NFT Marketplace** em React e TypeScript, seguindo o [layout no Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1).
+Marketplace de NFTs em React e TypeScript: catálogo, detalhe, carrinho, pagamento, confirmação de pedido, login, cadastro, perfil e carteiras, em desktop, tablet e mobile. A API REST e os eventos Socket.IO são simulados com MSW na camada de rede; nada depende de backend real, blockchain ou gateway de pagamento.
 
-O desafio avalia fidelidade visual, qualidade das interações, integração com APIs, gerenciamento de estado assíncrono, tempo real, acessibilidade e performance.
+- **Deploy**: _URL pública a preencher após o deploy na Vercel_ (build de demo com os mocks ligados).
+- **Enunciado do desafio**: [`docs/CHALLENGE.md`](docs/CHALLENGE.md).
+- **Arquitetura, contratos e decisões**: [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
-## 1. Escopo
+Stack: Vite 8, React 19, TypeScript 6 (strict), TanStack Router, TanStack Query, Axios, Zod 4, Socket.IO client, Tailwind CSS 4, shadcn/ui (Radix), MSW 2 + `@mswjs/socket.io-binding`, Playwright, Vitest e Lighthouse CI.
 
-Entregue os fluxos de descoberta, compra e conta do colecionador, com versões desktop e mobile. APIs, autenticação, carteiras e pagamentos devem funcionar com dados simulados. Integrações reais com blockchain, extensões de carteira e gateways de pagamento estão fora do escopo.
+## Requisitos
 
-O Figma define a identidade visual e a composição das telas. Este enunciado define os comportamentos e os cenários de avaliação. Estados não desenhados devem seguir o mesmo padrão visual.
+- Node 24 (`engines` no `package.json`).
+- pnpm via Corepack: `corepack enable` (a versão vem de `packageManager`).
+- Docker, só para os testes de regressão visual.
 
-## 2. Stack obrigatória
+## Setup
 
-| Responsabilidade | Tecnologia |
+```bash
+corepack enable
+pnpm install
+pnpm exec playwright install chromium   # só para os testes E2E
+pnpm dev                                # http://localhost:5173, com mocks
+```
+
+## Comandos
+
+| Comando | O que faz |
 | --- | --- |
-| Interface | React |
-| Linguagem | TypeScript |
-| Roteamento | TanStack Router |
-| Estado remoto | TanStack Query |
-| Cliente HTTP | Axios |
-| Integração de dados | REST APIs |
-| Tempo real | Socket.IO |
-| Estilização | Tailwind CSS |
-| Componentes | shadcn/ui |
-| Mocking | MSW |
-| Testes E2E e regressão visual | Playwright |
-| Auditoria de performance e qualidade | Lighthouse |
+| `pnpm dev` | Servidor de desenvolvimento com os mocks ligados (`.env.development`) |
+| `pnpm build` | Verificação de tipos + build de produção (sem mocks; chama `VITE_API_URL`) |
+| `pnpm build:demo` | Build com os mocks ligados (`.env.demo`). Usado pela Vercel, pelo Playwright e pelo Lighthouse |
+| `pnpm preview` | Serve o `dist/` em http://localhost:4173 |
+| `pnpm typecheck` | `tsc -b --noEmit` |
+| `pnpm lint` | ESLint (inclui as regras de dependência entre camadas) |
+| `pnpm format` / `pnpm format:check` | Prettier |
+| `pnpm test:unit` | Vitest: ETH, guarda de versão dos eventos, regras do mock, schemas |
+| `pnpm test:e2e` | Playwright (Chromium, desktop e mobile), sem os testes visuais |
+| `pnpm test:visual` | Regressão visual dentro da imagem Docker `mcr.microsoft.com/playwright:v1.65.0-noble` |
+| `pnpm test:visual:update` | Regera as baselines visuais na mesma imagem |
+| `pnpm lighthouse` | Build de demo + Lighthouse mobile e desktop + `lighthouse/SUMMARY.md` |
+| `pnpm images` | Converte as artes do Figma (`docs/figma/`, fora do repositório) em AVIF/WebP responsivos. A saída já está versionada em `src/assets/nfts`; não é preciso rodar |
 
-As tecnologias devem participar efetivamente da solução. A ferramenta de build, a organização do projeto e as bibliotecas complementares ficam a critério do candidato.
+Para ver o build de demo localmente: `pnpm build:demo && pnpm preview`.
 
-## 3. Telas e fluxos
+## Variáveis de ambiente
 
-| Tela | Funcionalidades obrigatórias |
+Modelo em [`.env.example`](.env.example). `.env.development` e `.env.demo` já ligam os mocks; não há segredos.
+
+| Variável | Padrão | Uso |
+| --- | --- | --- |
+| `VITE_API_MOCKING` | `enabled` em dev e demo | `enabled` liga o MSW (REST e Socket.IO) antes de montar o app |
+| `VITE_API_URL` | `/api` | Base da API REST real, usada quando os mocks estão desligados |
+| `VITE_SOCKET_URL` | origem da página | Origem do Socket.IO; o mock usa a mesma |
+
+## Credenciais fictícias e cupons
+
+| Colecionador | E-mail | Senha | Particularidades |
+| --- | --- | --- | --- |
+| Ana | `ana@kurio.dev` | `Kurio@123` | Carteira principal e secundária, favoritos próprios |
+| Bruno | `bruno@kurio.dev` | `Kurio@123` | Só carteira principal, favoritos diferentes da Ana |
+
+| Cupom | Efeito |
 | --- | --- |
-| Início | Destaques, catálogo, busca, filtros, ordenação e navegação para o NFT |
-| Detalhes do NFT | Galeria, informações, edição, quantidade, favoritos e compra |
-| Carrinho de NFTs | Edição de quantidades, remoção, cupom e resumo de valores |
-| Pagamento | Dados do colecionador, seleção de carteira e rede, revisão e envio do pedido |
-| Confirmação de pedido | Resultado, identificação da transação, itens, taxas e total |
-| Login | Autenticação, validação e retorno ao fluxo anterior |
-| Cadastro | Criação de conta, validação e tratamento de conflito |
-| Perfil do colecionador | Edição dos dados, avatar e alteração de senha |
-| Carteiras | Cadastro e edição de carteiras principal e secundária |
-
-Implemente os frames desktop e mobile disponíveis. Perfil, carteiras e confirmação também devem funcionar em mobile, mesmo sem um frame específico.
-
-Páginas editoriais, suporte, atividade, ofertas e downloads não fazem parte da entrega. Links externos e ações auxiliares devem ter comportamento coerente; ações fora do escopo não devem aparentar sucesso funcional.
-
-### Catálogo e detalhe
-
-- Busca, filtros, ordenação e paginação devem compor o estado da URL e sobreviver a refresh e navegação pelo histórico.
-- Filtros devem ser combináveis; mudança de filtro deve reiniciar a paginação.
-- As consultas devem refletir os parâmetros enviados à API, com tratamento de resultados vazios, falhas e respostas fora de ordem.
-- O detalhe deve suportar acesso direto, NFT inexistente, edição indisponível e limite de quantidade.
-- Favoritos devem persistir para o usuário autenticado.
-
-### Carrinho
-
-- Adicionar, alterar e remover itens, respeitando a disponibilidade por NFT e edição.
-- Manter o carrinho após refresh e preservar os itens do visitante ao autenticar.
-- Aplicar e remover cupom, com tratamento de código inválido ou expirado.
-- Exibir subtotal, desconto, taxa de rede e total coerentes com a resposta da API.
-- Refletir alterações de preço e disponibilidade recebidas enquanto o carrinho estiver aberto.
-
-Valores em ETH devem trafegar como strings decimais e manter precisão nos cálculos e na apresentação. Quantidades são inteiras. A cotação da API é a referência para finalizar o pedido.
-
-### Pagamento e confirmação
-
-- Validar os campos do layout e permitir revisão antes do envio.
-- Utilizar as carteiras cadastradas, com seleção de rede e simulação de conexão, recusa e desconexão.
-- Revalidar preço, disponibilidade, cupom e taxas antes de confirmar a compra. Mudanças devem exigir nova confirmação do usuário.
-- Impedir pedidos duplicados em cliques repetidos ou reenvios após timeout.
-- Representar pedido pendente, confirmado e recusado, com recuperação após refresh ou reconexão.
-- Exibir a confirmação somente para pedido efetivamente confirmado na simulação.
-- Preservar os itens em falhas; após confirmação, remover do carrinho apenas os itens e quantidades comprados.
-
-O recibo deve reproduzir o snapshot do pedido. Alterações posteriores no catálogo não podem modificar seus valores. Referências de transação e links de exploração são simulados.
-
-### Conta e sessão
-
-Cadastro, login, logout e sessão são obrigatórios, integrados à API simulada. Checkout, perfil, carteiras, favoritos e pedidos exigem autenticação.
-
-A sessão deve ser recuperável após refresh. Trate expiração durante a navegação e durante o checkout, preservando o contexto para retomada. Logout e troca de usuário devem limpar dados privados em cache e subscriptions da sessão anterior.
-
-Valide os formulários de cadastro, perfil, senha e carteiras, incluindo erros retornados pela API. Alterações confirmadas devem permanecer após refresh. Use credenciais fictícias e não armazene senhas em claro.
-
-## 4. Integração e estado
-
-Use TanStack Router nas rotas, parâmetros de busca e proteção dos fluxos privados. Use TanStack Query nas consultas, mutations e sincronização do cache. As chamadas REST devem passar pelo Axios.
-
-A solução deve garantir:
-
-- contratos tipados entre transporte, estado e interface;
-- estados de carregamento, vazio, erro, sucesso e atualização em segundo plano;
-- invalidação coerente após mutations e eventos;
-- cancelamento ou descarte de respostas obsoletas;
-- isolamento dos dados por usuário e pelos parâmetros da consulta;
-- recuperação de falhas sem duplicar operações;
-- tratamento de rotas inexistentes e acesso direto a qualquer tela prevista.
-
-Aplique atualização otimista em pelo menos uma interação, com rollback em caso de falha. A política de cache, retries e sincronização deve ser documentada.
-
-## 5. Contratos REST
-
-Defina e documente os contratos utilizados. Os recursos mínimos são:
-
-| Recurso | Operações |
-| --- | --- |
-| Sessão e conta | Cadastro, login, consulta da sessão, logout e expiração |
-| NFTs | Listagem com busca/filtros/ordenação/paginação e detalhe por identificador |
-| Favoritos | Consulta, inclusão e remoção |
-| Carrinho | Consulta, inclusão, alteração e remoção de itens |
-| Cotação | Validação de cupom, disponibilidade, descontos, taxas e total |
-| Pedidos | Criação idempotente e consulta do estado e recibo |
-| Perfil | Consulta, atualização de dados/avatar e alteração de senha |
-| Carteiras | Consulta, cadastro e atualização |
-
-As respostas devem representar erros de validação, sessão inválida, falta de permissão, recurso inexistente, conflito de disponibilidade e falha transitória.
-
-As mutations de pedido devem aceitar uma chave de idempotência. Na simulação, a mesma tentativa deve recuperar o mesmo pedido; reutilizar a chave com conteúdo diferente deve gerar conflito.
-
-## 6. Mocking com MSW
-
-Implemente os mocks na camada de rede, reutilizando contratos e cenários entre desenvolvimento, demonstração e testes. Componentes, hooks e cliente Axios não devem conter respostas fictícias ou caminhos alternativos de negócio.
-
-Os mocks devem manter estado consistente entre catálogo, favoritos, carrinho, perfil, carteiras e pedidos. Persistência local é permitida para sustentar refresh; o reset deve restaurar integralmente um cenário conhecido.
-
-### Simulating Network Conditions and Failures
-
-Simule condições de rede e falhas com MSW, incluindo lentidão, latência variável, timeouts, indisponibilidade de conexão e respostas HTTP de erro. Os cenários devem ser configuráveis e reproduzíveis, permitindo avaliar o carregamento, o feedback de erro e a recuperação da interface.
-
-Disponibilize fixtures com variedade suficiente para exercitar filtros e paginação, pelo menos dois usuários e cenários determinísticos de:
-
-- sucesso e resultado vazio;
-- latência variável e respostas fora de ordem;
-- falhas de conexão e respostas HTTP 4xx/5xx;
-- sessão expirada e acesso não autorizado;
-- conflito de cadastro ou de validação de formulário;
-- cupom inválido ou expirado;
-- preço alterado ou edição esgotada durante a compra;
-- timeout após criação do pedido, com recuperação por idempotência;
-- pagamento confirmado e pagamento recusado.
-
-Use MSW também na simulação dos eventos, com uma integração compatível com o protocolo Socket.IO, como [@mswjs/socket.io-binding](https://github.com/mswjs/socket.io-binding). Documente o transporte utilizado e suas limitações no ambiente de mocks.
-
-Os cenários devem exercitar `socket.io-client`. Substituir o socket por chamadas diretas a setters, callbacks ou ao cache não atende ao requisito.
-
-A camada de mocks deve ser ativada por configuração e estar disponível no build de demonstração. Mudanças nos dados simulados devem ser refletidas tanto nas respostas REST quanto nos eventos correspondentes.
-
-## 7. Tempo real com Socket.IO
-
-Implemente, no mínimo, os seguintes eventos:
-
-| Evento | Comportamento esperado |
-| --- | --- |
-| `nft.updated` | Atualizar preço e disponibilidade no catálogo, detalhe e carrinho |
-| `order.updated` | Atualizar o estado do pedido e apresentar confirmação ou recusa |
-
-Os eventos devem carregar identidade estável, recurso afetado e versão. O cliente deve tolerar duplicatas e eventos antigos, sem regredir um estado mais recente nem reaplicar efeitos.
-
-Após reconexão, reconcilie os recursos ativos com a API REST. Eventos de uma sessão anterior não podem atualizar dados de outro usuário. Listeners e subscriptions devem ser liberados ao encerrar seu ciclo de vida.
-
-Implemente o cenário:
-
-1. Um NFT está no carrinho.
-2. Seu preço ou disponibilidade muda durante a navegação.
-3. A interface informa a alteração e atualiza o resumo.
-4. O checkout impede a confirmação com uma cotação desatualizada.
-
-Também deve funcionar uma interrupção de conexão enquanto o pedido está pendente. Após reconectar ou recarregar a página, o usuário deve recuperar seu estado sem criar outra compra. Pedidos confirmados ou recusados são terminais.
-
-## 8. Interface, responsividade e acessibilidade
-
-Preserve tipografia, cores, espaçamentos, hierarquia, imagens, proporções e composição do Figma. Adapte os componentes shadcn/ui à identidade visual do projeto.
-
-Todas as telas devem funcionar em desktop, tablet e mobile, com atenção a filtros, navegação, formulários, carrinho e checkout. Avalie, no mínimo, larguras de 390, 768 e 1440 pixels.
-
-Use **skeletons com shimmer effect** nos componentes dependentes de dados durante o carregamento, incluindo catálogo, detalhe e resumo do carrinho. Preserve as dimensões do conteúdo para evitar deslocamentos de layout e respeite a preferência por movimento reduzido.
-
-São obrigatórios:
-
-- navegação por teclado e foco visível;
-- controle de foco em diálogos e drawers;
-- semântica adequada, labels e mensagens de erro associadas aos campos;
-- alternativas textuais para imagens relevantes;
-- contraste legível e estados não dependentes apenas de cor;
-- feedback acessível para mutations e alterações em tempo real;
-- ausência de overflow horizontal indevido e perda de conteúdo com zoom.
-
-Use os assets do arquivo quando disponíveis e mantenha imagens e fontes necessárias acessíveis à execução local. Documente qualquer substituição de asset ou ajuste de acessibilidade em relação ao layout.
-
-## 9. Testes com Playwright
-
-Entregue testes E2E executáveis com os mocks, cobrindo:
-
-1. Busca, filtros combinados, ordenação, paginação e restauração pelo histórico.
-2. Acesso direto ao detalhe e tratamento de recurso inexistente.
-3. Cadastro, login, expiração de sessão, logout e troca de usuário.
-4. Favoritos, incluindo falha de mutation e recuperação do estado.
-5. Carrinho, quantidades, remoção, cupom e persistência após refresh/login.
-6. Compra completa, do catálogo ao recibo confirmado.
-7. Falha de pagamento, clique repetido e timeout com recuperação do mesmo pedido.
-8. Edição de perfil, avatar, senha e carteiras, com erros de validação.
-9. Alteração de preço/disponibilidade via Socket.IO durante o checkout.
-10. Eventos duplicados ou antigos, desconexão e retomada de pedido pendente.
-11. Navegação por teclado, foco de diálogos e validação de formulários.
-12. Skeletons durante carregamento lento, feedback de falha e recuperação após nova tentativa.
-
-Execute os fluxos principais em Chromium, nos viewports desktop e mobile. Inclua regressão visual de início, detalhe, carrinho e pagamento, com baselines versionadas e dados estáveis.
-
-Cada teste deve partir de um estado isolado. Controle relógio, latência e disparo dos eventos nos cenários sensíveis a tempo. Entregue relatório HTML e traces das falhas.
-
-As verificações devem observar a interface e os resultados das operações. Os testes de tempo real precisam passar pelo cliente Socket.IO e os de REST pelos handlers MSW.
-
-## 10. Performance e Lighthouse
-
-Audite início e detalhe do NFT com Lighthouse em perfis mobile e desktop, usando build otimizado e o cenário padrão dos mocks.
-
-| Categoria | Meta |
-| --- | ---: |
-| Performance | ≥ 90 |
-| Accessibility | ≥ 95 |
-| Best Practices | ≥ 95 |
-| SEO | ≥ 90 |
-
-Execute três medições por página e perfil e reporte a mediana de cada categoria. Versione a configuração da auditoria e entregue relatórios HTML/JSON, versões das ferramentas, ambiente e condições de execução.
-
-Registre LCP, CLS e TBT. Justifique resultados abaixo das metas e identifique as causas. A auditoria deve carregar as imagens, fontes e funcionalidades da entrega, sem simplificações exclusivas para melhorar a pontuação.
-
-## 11. Critérios de avaliação
-
-| Critério | Pontos | Evidência esperada |
-| --- | ---: | --- |
-| Fidelidade visual e responsividade | 20 | Aderência ao Figma e consistência entre tamanhos de tela |
-| Fluxos e experiência de uso | 20 | Compra e conta completas, validações e recuperação de erros |
-| Integração e estado | 15 | Router, Query, Axios, contratos e cache coerentes |
-| Tempo real | 10 | Eventos, reconexão, ordenação e sincronização com REST |
-| Mocking | 10 | MSW, cenários determinísticos, persistência e reset |
-| Testes | 10 | Cobertura dos fluxos e falhas com Playwright |
-| Acessibilidade | 5 | Operação por teclado, semântica, foco e feedback |
-| Performance | 5 | Resultados e análise das auditorias Lighthouse |
-| Arquitetura e documentação | 5 | Tipagem, responsabilidades e execução reproduzível |
-| **Total** | **100** | |
-
-São eliminatórios: ausência de uso efetivo da stack obrigatória, fluxos principais apenas visuais, compra confirmada sem resposta da simulação, exposição de dados entre usuários, eventos simulados diretamente na UI ou ausência de testes E2E executáveis.
-
-## 12. Entrega
-
-Entregue código-fonte, lockfile, assets, mocks, fixtures, testes e configurações de auditoria.
-
-O **deploy é obrigatório**. Envie o link do repositório e uma URL pública da aplicação. Recomenda-se [Vercel](https://vercel.com/docs/frameworks/frontend/vite); [Netlify](https://docs.netlify.com/build/frameworks/framework-setup-guides/vite/) e [Cloudflare Pages](https://developers.cloudflare.com/pages/framework-guides/deploy-a-react-site/) também são aceitos.
-
-A versão publicada deve corresponder ao código entregue e permanecer acessível durante a avaliação, com os mocks e os fluxos de tempo real funcionando. Acesso direto e refresh das rotas devem funcionar no ambiente publicado.
-
-O `README.md` da solução deve conter setup, variáveis de ambiente, credenciais fictícias, seleção e reset dos cenários, comandos de execução e instruções para reproduzir os fluxos de falha.
-
-Documente os contratos REST e eventos, a política de sessão, o estado do carrinho, a estratégia de cache e a reconciliação entre REST e Socket.IO. Registre limitações, decisões de UX e eventuais desvios do Figma em `ARCHITECTURE.md`.
-
-Disponibilize comandos para desenvolvimento com mocks, build, preview, verificação de tipos, lint, testes Playwright e auditoria Lighthouse.
-
-A entrega deve executar a partir de um checkout limpo, sem depender de serviços privados ou do backend de produção.
+| `KURIO10` | 10% sobre o subtotal |
+| `EXPIRADO` | Sempre recusado como expirado |
+| `RELAMPAGO` | 20%, válido ao aplicar, mas expira 5 min após a primeira aplicação (some na próxima cotação, com aviso) |
+
+Cadastrar com `ana@kurio.dev` ou com o usuário `ana` gera o conflito de cadastro.
+
+## Cenários dos mocks
+
+O cenário vem de `?scenario=<nome>` em qualquer URL, fica guardado em `localStorage` (sobrevive a refresh) e troca o banco para a seed dele. O bootstrap remove o parâmetro da URL depois de aplicar.
+
+As URLs abaixo usam o `pnpm dev`; no deploy, troque a origem pela URL pública.
+
+| Cenário | Efeito | URL |
+| --- | --- | --- |
+| `default` | Tudo funciona, latência fixa de 150 ms | http://localhost:5173/?scenario=default |
+| `empty` | Catálogo vazio | http://localhost:5173/?scenario=empty |
+| `slow` | Latência de 1,5 a 3 s (skeletons visíveis) | http://localhost:5173/?scenario=slow |
+| `flaky` | As 2 primeiras buscas do catálogo respondem 503, depois funciona | http://localhost:5173/?scenario=flaky |
+| `offline` | Toda chamada falha por rede e o socket não conecta | http://localhost:5173/?scenario=offline |
+| `out-of-order` | Buscas mais antigas respondem depois das mais novas | http://localhost:5173/?scenario=out-of-order |
+| `session-expired` | A sessão expira na próxima chamada privada | http://localhost:5173/?scenario=session-expired |
+| `payment-refused` | O pedido termina recusado (pagamento recusado) | http://localhost:5173/?scenario=payment-refused |
+| `wallet-rejected` | A conexão da carteira é recusada | http://localhost:5173/?scenario=wallet-rejected |
+| `wallet-disconnected` | A carteira cai antes de criar o pedido | http://localhost:5173/?scenario=wallet-disconnected |
+| `order-timeout` | O pedido é criado, mas a resposta é segurada por 15 s (o cliente desiste em 10 s) | http://localhost:5173/?scenario=order-timeout |
+| `price-change` | O preço de um NFT do carrinho sobe 10% 4 s depois de abrir o carrinho ou a revisão | http://localhost:5173/?scenario=price-change |
+| `sold-out` | A edição de um NFT do carrinho esgota 4 s depois de abrir a revisão | http://localhost:5173/?scenario=sold-out |
+
+**Reset**: `?reset=1` volta o banco à seed do cenário atual; trocar de cenário também reseta. `?scenario=default` volta ao normal.
+
+**Depuração** pelo console do navegador (só com os mocks ligados):
+
+```js
+__mock.scenario()                         // cenário atual
+__mock.scenario('slow')                   // troca e reseta
+__mock.reset()                            // volta à seed do cenário atual
+__mock.updateNft('nft_001', { ... })      // muda um NFT como o servidor faria e emite nft.updated
+__mock.emit(evento)                       // entrega um evento como veio (duplicado ou antigo)
+__mock.dropSocket()                       // derruba o Socket.IO; o cliente reconecta sozinho
+__mock.expireSession()                    // a próxima chamada privada responde 401 SESSION_EXPIRED
+__mock.failNext({ method: 'PUT', path: '/me/favorites' }, 1)  // próxima chamada que casa responde 503
+```
+
+As requisições REST aparecem na aba Network; o Socket.IO mockado não aparece lá (use os logs do MSW no console).
+
+## Reproduzindo os fluxos de falha
+
+Para os fluxos de compra: entre como Ana, adicione um NFT ao carrinho e siga até o pagamento. Abra a URL do cenário **antes** de começar, ou depois de entrar (trocar de cenário reseta o banco, mas a sessão e o carrinho voltam à seed).
+
+- **Resultado vazio** (`empty`): abra a Início. A grade mostra o estado vazio.
+- **Carregamento lento** (`slow`): abra a Início ou um NFT. Grade, filtros, detalhe e resumo do carrinho mostram skeletons com shimmer.
+- **Falha transitória** (`flaky`): abra a Início. A grade mostra o erro com "Tentar novamente"; após a segunda tentativa, o catálogo carrega.
+- **Sem conexão** (`offline`): abra qualquer tela. Aparece o erro de rede com "Tentar novamente".
+- **Respostas fora de ordem** (`out-of-order`): digite uma busca rápido, letra a letra. A grade sempre mostra o resultado da busca atual.
+- **Sessão expirada**: em qualquer cenário, entre como Ana, rode `__mock.expireSession()` no console e abra o perfil (ou clique em "Confirmar compra" na revisão). Aparece "Sua sessão expirou, entre novamente" e o login abre com `redirect` para a tela atual; depois de entrar, você volta a ela (no pagamento, ao passo de dados, já preenchido pela carteira). O cenário `session-expired` faz o mesmo na primeira chamada privada, que costuma ser o carrinho do header logo após o login.
+- **Conflito de cadastro**: abra http://localhost:5173/?auth=cadastro (ou "Entrar" → "Criar conta") e cadastre com `ana@kurio.dev`. O erro aparece no campo de e-mail.
+- **Cupom inválido ou expirado**: no carrinho, aplique `NAOEXISTE` ou `EXPIRADO`. O erro aparece no campo do cupom.
+- **Pagamento recusado** (`payment-refused`): confirme a compra. O pedido fica pendente ~3 s e termina recusado, com o motivo e "Voltar ao pagamento"; o carrinho fica intacto.
+- **Carteira recusada** (`wallet-rejected`): avance para a revisão. A conexão é recusada, com "Tentar de novo".
+- **Carteira desconectada** (`wallet-disconnected`): confirme a compra. A UI pede para reconectar sem perder os dados.
+- **Timeout do pedido** (`order-timeout`): confirme a compra. Aparece "Verificando seu pedido…" e o cliente reenvia com a mesma chave de idempotência; o mesmo pedido é recuperado, sem duplicar.
+- **Clique repetido**: em qualquer cenário, clique várias vezes em "Confirmar compra". Só um pedido é criado.
+- **Preço alterado** (`price-change`): abra o carrinho e espere 4 s. A linha é destacada, o anúncio informa o preço novo e o resumo é atualizado. Na revisão, "Confirmar compra" fica bloqueado até "Atualizar cotação".
+- **Edição esgotada** (`sold-out`): vá até a revisão e espere 4 s. A cotação fica obsoleta e a confirmação é bloqueada.
+- **Queda do socket com pedido pendente**: em `payment-refused` ou `default`, confirme a compra e rode `__mock.dropSocket()` ou recarregue a página. O pedido é retomado pelo id, sem nova compra.
+- **Eventos duplicados ou antigos**: com um NFT aberto, emita o mesmo evento duas vezes ou um com versão menor via `__mock.emit(...)`. A tela não regride nem repete o anúncio.
+
+## Testes
+
+```bash
+pnpm test:unit       # Vitest
+pnpm test:e2e        # Playwright: builda o demo, sobe o preview na 4173 e roda desktop + mobile
+pnpm test:visual     # regressão visual (Docker)
+```
+
+- Os specs ficam em `e2e/`, um smoke (`00-smoke`) e um por fluxo do enunciado (`01-catalog` a `12-loading-errors`), mais `visual.spec.ts` com as 8 baselines (Início, Detalhe, Carrinho e Pagamento × desktop e mobile) em `e2e/visual.spec.ts-snapshots/`.
+- Cada teste parte de contexto novo, storage vazio, seed do cenário e relógio fixo (`page.clock`).
+- Relatório HTML em `playwright-report/` (`pnpm exec playwright show-report`). Traces e screenshots das falhas em `test-results/` (`pnpm exec playwright show-trace <arquivo>.zip`).
+- As baselines visuais são geradas e comparadas só na imagem Docker, para não variar com fontes e renderização do sistema.
+
+## Lighthouse
+
+```bash
+pnpm lighthouse
+```
+
+Builda o demo, roda 3 medições de `/` e `/nft/nft_001` nos perfis mobile e desktop e grava os relatórios HTML/JSON em `lighthouse/mobile/` e `lighthouse/desktop/`, com o resumo em [`lighthouse/SUMMARY.md`](lighthouse/SUMMARY.md). Configuração em `lighthouserc.mobile.json` e `lighthouserc.desktop.json`.
+
+Medianas da última execução:
+
+| Perfil | Página | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| mobile | `/` | 84 | 100 | 100 | 100 | 3481 ms | 0.000 | 177 ms |
+| mobile | `/nft/nft_001` | 84 | 100 | 100 | 100 | 3305 ms | 0.000 | 259 ms |
+| desktop | `/` | 99 | 96 | 100 | 100 | 794 ms | 0.004 | 0 ms |
+| desktop | `/nft/nft_001` | 100 | 100 | 100 | 100 | 767 ms | 0.000 | 0 ms |
+
+Performance mobile fica abaixo de 90 por causa do MSW e da latência simulada no caminho crítico do build de demo. A análise está em [`ARCHITECTURE.md`](ARCHITECTURE.md#performance).
+
+## Documentação
+
+- [`ARCHITECTURE.md`](ARCHITECTURE.md): camadas, módulos, contratos REST e eventos, sessão, carrinho, pedido, cache, reconciliação REST × Socket.IO, mocks, acessibilidade, desvios do Figma e performance.
+- [`docs/CHALLENGE.md`](docs/CHALLENGE.md): enunciado original.
