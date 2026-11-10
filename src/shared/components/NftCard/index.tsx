@@ -11,7 +11,7 @@ export function NftCard({ nft, actions, priority = false }: NftCardProps) {
 
   return (
     <article className="relative flex flex-col gap-3 rounded-lg bg-card p-2 lg:bg-transparent lg:p-0">
-      <div className="relative overflow-hidden rounded-lg bg-card lg:p-2">
+      <div className="relative overflow-hidden rounded-lg bg-card lg:rounded-sm lg:px-1 lg:py-6">
         {image && (
           <img
             src={image.src}
@@ -45,7 +45,7 @@ export function NftCard({ nft, actions, priority = false }: NftCardProps) {
           <p className="flex flex-wrap items-baseline gap-x-2 text-sm font-bold">
             <EthPrice value={edition.price} className="text-primary" />
             {edition.compareAtPrice && (
-              <s className="font-normal text-muted-foreground">
+              <s className="font-normal text-[#B0916A] no-underline">
                 <span className="sr-only">Preço anterior: </span>
                 <EthPrice value={edition.compareAtPrice} />
               </s>

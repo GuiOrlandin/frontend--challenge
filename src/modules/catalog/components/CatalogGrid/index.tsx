@@ -15,7 +15,8 @@ import { catalogQueries } from '../../queries'
 
 import type { CatalogGridProps } from './types'
 
-const GRID = 'grid grid-cols-2 gap-x-3 gap-y-6 md:grid-cols-3 md:gap-x-8 md:gap-y-10'
+const GRID =
+  'grid grid-cols-2 gap-x-3 gap-y-6 md:grid-cols-3 md:gap-x-8 md:gap-y-10 lg:gap-x-[34px] lg:gap-y-18'
 
 /**
  * Grade do catálogo. Sem `placeholderData`: cada busca nova mostra o skeleton (SPEC §11.5),
@@ -67,7 +68,7 @@ export function CatalogGrid({ search }: CatalogGridProps) {
   }
 
   return (
-    <div className="flex flex-col gap-10" aria-busy={query.isFetching}>
+    <div className="flex flex-col gap-10 lg:gap-22" aria-busy={query.isFetching}>
       <p role="status" className="sr-only">
         {total === 1 ? '1 NFT encontrado' : `${total} NFTs encontrados`}
       </p>
@@ -89,8 +90,10 @@ export function CatalogGrid({ search }: CatalogGridProps) {
 
 const pageLinkClass = (active: boolean) =>
   cn(
-    'flex size-8 items-center justify-center rounded-sm text-sm transition-colors focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
-    active ? 'bg-primary font-medium text-primary-foreground' : 'bg-card hover:bg-accent',
+    'flex size-8 items-center justify-center rounded-sm border text-sm transition-colors focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
+    active
+      ? 'border-primary bg-primary font-medium text-primary-foreground'
+      : 'border-border bg-background hover:bg-accent',
   )
 
 /** Paginação numerada (push no histórico), rolando até o topo do catálogo. */
@@ -109,7 +112,7 @@ function CatalogPagination({ page, totalPages }: { page: number; totalPages: num
 
   return (
     <nav aria-label="Paginação" className="flex justify-end">
-      <ul className="flex items-center gap-2">
+      <ul className="flex items-center gap-2.5">
         {page > 1 && (
           <li>
             <Link

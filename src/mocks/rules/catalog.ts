@@ -33,25 +33,8 @@ export function queryCatalog(
 ): Page<Nft> {
   const page = params.page ?? CATALOG_DEFAULTS.page
   const pageSize = params.pageSize ?? CATALOG_DEFAULTS.pageSize
-  const term = fold(params.q ?? '')
-  const categories = new Set(params.category ?? [])
-  const networks = new Set<string>(params.network ?? [])
-  const min = params.priceMin === undefined ? undefined : toWei(params.priceMin)
-  const max = params.priceMax === undefined ? undefined : toWei(params.priceMax)
-  const inTab = tabFilter(params.tab ?? CATALOG_DEFAULTS.tab, context)
-
   const matches = nfts
-    .filter((nft) => {
-      if (term && !searchText(nft).includes(term)) return false
-      if (categories.size > 0 && !categories.has(nft.category.id)) return false
-      if (networks.size > 0 && !networks.has(nft.network)) return false
-      if (params.collection !== undefined && nft.collection.id !== params.collection) return false
-      if (!inTab(nft)) return false
-      const price = toWei(displayPrice(nft))
-      if (min !== undefined && price < min) return false
-      if (max !== undefined && price > max) return false
-      return true
-    })
+    .filter(catalogFilter(params, context))
     .sort(comparators[params.sort ?? CATALOG_DEFAULTS.sort])
 
   const start = (page - 1) * pageSize
@@ -61,6 +44,28 @@ export function queryCatalog(
     pageSize,
     total: matches.length,
     totalPages: Math.ceil(matches.length / pageSize),
+  }
+}
+
+/** Predicado com todos os filtros do catálogo (busca, Categoria, Rede, Coleção, aba e preço). */
+function catalogFilter(params: CatalogParams, context: CatalogContext): (nft: Nft) => boolean {
+  const term = fold(params.q ?? '')
+  const categories = new Set(params.category ?? [])
+  const networks = new Set<string>(params.network ?? [])
+  const min = params.priceMin === undefined ? undefined : toWei(params.priceMin)
+  const max = params.priceMax === undefined ? undefined : toWei(params.priceMax)
+  const inTab = tabFilter(params.tab ?? CATALOG_DEFAULTS.tab, context)
+
+  return (nft) => {
+    if (term && !searchText(nft).includes(term)) return false
+    if (categories.size > 0 && !categories.has(nft.category.id)) return false
+    if (networks.size > 0 && !networks.has(nft.network)) return false
+    if (params.collection !== undefined && nft.collection.id !== params.collection) return false
+    if (!inTab(nft)) return false
+    const price = toWei(displayPrice(nft))
+    if (min !== undefined && price < min) return false
+    if (max !== undefined && price > max) return false
+    return true
   }
 }
 
@@ -110,26 +115,31 @@ const clampPageSize = (n: number | undefined) =>
   n === undefined ? undefined : Math.min(n, MAX_PAGE_SIZE)
 
 /**
- * Contagens globais da barra lateral (não recalculadas pelos filtros). Todas as Categorias e
- * Redes aparecem, mesmo com zero; a faixa de preço cobre os preços exibidos.
+ * Contagens da barra lateral sob os filtros ativos. Cada grupo ignora a própria seleção (senão
+ * só a opção marcada teria itens): Coleções contam com a Rede escolhida, e vice-versa. Todas as
+ * Categorias e Redes aparecem, mesmo com zero. A faixa de preço é do catálogo inteiro, para os
+ * limites do Slider não mudarem a cada filtro.
  */
 export function computeFacets(
   nfts: readonly Nft[],
   categories: readonly { id: string; label: string }[],
   networkLabels: Record<Network, string>,
+  params: CatalogParams,
+  context: CatalogContext,
 ): Facets {
-  const count = (predicate: (nft: Nft) => boolean) => nfts.filter(predicate).length
+  const byCategory = nfts.filter(catalogFilter({ ...params, category: undefined }, context))
+  const byNetwork = nfts.filter(catalogFilter({ ...params, network: undefined }, context))
   const prices = nfts.map(displayPrice).sort(compareEth)
   return {
     categories: categories.map(({ id, label }) => ({
       id,
       label,
-      count: count((nft) => nft.category.id === id),
+      count: byCategory.filter((nft) => nft.category.id === id).length,
     })),
     networks: NETWORKS.map((id) => ({
       id,
       label: networkLabels[id],
-      count: count((nft) => nft.network === id),
+      count: byNetwork.filter((nft) => nft.network === id).length,
     })),
     priceRange: { min: prices[0] ?? '0', max: prices.at(-1) ?? '0' },
   }

@@ -16,11 +16,12 @@ export const Route = createFileRoute('/')({
     sort,
     page,
   }),
-  // Só adianta as buscas: a grade e os filtros usam `useQuery` e mostram o próprio skeleton,
+  // Só adianta as buscas: hero, grade e filtros usam `useQuery` e mostram o próprio skeleton,
   // erro e retry (SPEC §11.4), sem trocar a página inteira a cada filtro.
   loader: ({ context: { queryClient }, deps }) => {
     void queryClient.prefetchQuery(catalogQueries.list(deps))
-    void queryClient.prefetchQuery(catalogQueries.facets())
+    void queryClient.prefetchQuery(catalogQueries.facets(deps))
+    void queryClient.prefetchQuery(catalogQueries.highlights())
   },
   component: HomePage,
 })

@@ -30,7 +30,7 @@ export const CATALOG_DEFAULTS = {
   tab: 'all',
   sort: 'recent',
   page: 1,
-  pageSize: 12,
+  pageSize: 9,
 } as const satisfies CatalogParams
 
 const sortedUnique = <T extends string>(values: readonly T[] | undefined): T[] | undefined => {

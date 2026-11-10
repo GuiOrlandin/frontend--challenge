@@ -1,8 +1,8 @@
-import { queryOptions } from '@tanstack/react-query'
+import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 
 import { normalizeCatalogParams, type CatalogParams } from '@/shared/contracts'
 
-import { getFacets, getNfts } from './api'
+import { getFacets, getHighlights, getNfts } from './api'
 
 const FIVE_MINUTES = 5 * 60_000
 
@@ -15,10 +15,26 @@ export const catalogQueries = {
       queryFn: ({ signal }) => getNfts(normalized, signal),
     })
   },
-  facets: () =>
+  /** Contagens sob os filtros ativos; página e ordenação não mudam as contagens. */
+  facets: (params: CatalogParams) => {
+    const filters = normalizeCatalogParams({
+      ...params,
+      page: undefined,
+      sort: undefined,
+      pageSize: undefined,
+    })
+    return queryOptions({
+      queryKey: ['nfts', 'facets', filters],
+      queryFn: ({ signal }) => getFacets(filters, signal),
+      staleTime: FIVE_MINUTES,
+      // Mantém os números anteriores enquanto recalcula: a barra não pisca a cada filtro.
+      placeholderData: keepPreviousData,
+    })
+  },
+  highlights: () =>
     queryOptions({
-      queryKey: ['nfts', 'facets'],
-      queryFn: ({ signal }) => getFacets(signal),
+      queryKey: ['highlights'],
+      queryFn: ({ signal }) => getHighlights(signal),
       staleTime: FIVE_MINUTES,
     }),
 }

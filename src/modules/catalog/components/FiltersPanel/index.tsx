@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
-import CheckIcon from '@/assets/icons/check.svg?react'
 import { ErrorState } from '@/shared/components/ErrorState'
 import type { Eth, Facets } from '@/shared/contracts'
 import { formatEth, toWei } from '@/shared/lib/eth'
@@ -20,7 +19,8 @@ const fromCents = (cents: number): Eth => (cents / 100).toFixed(2)
 
 /** Coleções (Categorias), faixa de preço e Rede. Mesmo conteúdo na barra lateral e no Sheet. */
 export function FiltersPanel() {
-  const facets = useQuery(catalogQueries.facets())
+  const { search } = useCatalogSearch()
+  const facets = useQuery(catalogQueries.facets(search))
 
   if (facets.isPending || (facets.isError && facets.isFetching)) {
     return (
@@ -46,8 +46,8 @@ export function FiltersPanel() {
 function Filters({ facets }: { facets: Facets }) {
   const { search, update } = useCatalogSearch()
 
-  const toggle = <T extends string>(list: T[], id: T) =>
-    list.includes(id) ? list.filter((value) => value !== id) : [...list, id]
+  // Uma opção por grupo: escolher outra troca a atual; clicar na atual desmarca.
+  const toggle = <T extends string>(list: T[], id: T): T[] => (list.includes(id) ? [] : [id])
 
   return (
     <div className="flex flex-col gap-8">
@@ -110,14 +110,11 @@ function FilterOption(props: {
         onClick={props.onClick}
         className={cn(
           'flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-sm transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
-          props.selected ? 'font-medium text-primary' : 'text-foreground',
+          props.selected ? 'font-bold text-option-active' : 'text-option',
         )}
       >
-        {/* Seleção não fica só na cor (SPEC §13.5): o check acompanha. */}
-        <span className="flex items-center gap-2">
-          {props.label}
-          {props.selected && <CheckIcon className="size-3.5" />}
-        </span>
+        {/* Além da cor, a selecionada fica em negrito (SPEC §13.5). */}
+        {props.label}
         <span>({props.count})</span>
       </button>
     </li>

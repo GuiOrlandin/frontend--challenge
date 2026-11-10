@@ -9,7 +9,10 @@ import { CatalogGrid } from '../../components/CatalogGrid'
 import { CatalogSearch } from '../../components/CatalogSearch'
 import { CatalogTabs } from '../../components/CatalogTabs'
 import { FiltersPanel } from '../../components/FiltersPanel'
+import { HeroCarousel } from '../../components/HeroCarousel'
+import { MintJournal, PromoBanners } from '../../components/HomeMarketing'
 import { SortSelect } from '../../components/SortSelect'
+import { Spotlight } from '../../components/Spotlight'
 import { useCatalogSearch } from '../../hooks/useCatalogSearch'
 
 /** Hash usado pela barra inferior para abrir o Sheet de filtros (SPEC §4.4). */
@@ -41,7 +44,8 @@ export function HomePage() {
   }
 
   return (
-    <PageContainer className="flex flex-col gap-6 py-4 lg:py-24">
+    // pb-8 + mt-16 do footer = 96 px até o rodapé (Figma).
+    <PageContainer className="flex flex-col gap-6 py-4 lg:pt-24 lg:pb-8">
       {/* Abaixo de `lg`: busca e filtros no topo (frame mobile). No desktop, a busca é a do header. */}
       <div className="flex items-center gap-3 lg:hidden">
         <CatalogSearch q={search.q} onSearch={onSearch} />
@@ -68,17 +72,23 @@ export function HomePage() {
         </Sheet>
       </div>
 
+      <HeroCarousel />
+
       <section
         id="catalogo"
         aria-labelledby="catalogo-titulo"
-        className="grid scroll-mt-4 gap-10 lg:grid-cols-[18rem_1fr]"
+        className="grid scroll-mt-4 gap-10 lg:mt-6 lg:grid-cols-[19.375rem_1fr]"
       >
         <h2 id="catalogo-titulo" className="sr-only">
           Catálogo
         </h2>
-        <aside aria-label="Filtros" className="hidden self-start rounded-lg bg-card p-6 lg:block">
-          <FiltersPanel />
-        </aside>
+        {/* Coluna de 310 px (frame do destaque): filtros e destaque, só em lg+. */}
+        <div className="hidden flex-col gap-6 self-start lg:flex">
+          <aside aria-label="Filtros" className="rounded-lg bg-card p-6">
+            <FiltersPanel />
+          </aside>
+          <Spotlight />
+        </div>
 
         <div className="flex min-w-0 flex-col gap-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -88,6 +98,11 @@ export function HomePage() {
           <CatalogGrid search={search} />
         </div>
       </section>
+
+      <div className="mt-10 flex flex-col gap-16 lg:mt-18 lg:gap-24">
+        <PromoBanners />
+        <MintJournal />
+      </div>
     </PageContainer>
   )
 }

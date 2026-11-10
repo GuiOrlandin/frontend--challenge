@@ -15,9 +15,13 @@ export const catalogHandlers = [
   }),
 
   // Antes de `/nfts/:id`, senão "facets" vira um id.
-  http.get(api('/nfts/facets'), () =>
-    HttpResponse.json<Facets>(computeFacets(db.data.nfts, CATEGORIES, NETWORK_LABELS)),
-  ),
+  // Mesma query da lista: as contagens seguem os filtros ativos.
+  http.get(api('/nfts/facets'), ({ request }) => {
+    const params = parseCatalogQuery(new URL(request.url).searchParams)
+    return HttpResponse.json<Facets>(
+      computeFacets(db.data.nfts, CATEGORIES, NETWORK_LABELS, params, { now: db.data.now }),
+    )
+  }),
 
   http.get<{ id: string }>(api('/nfts/:id'), ({ params }) => {
     const nft = db.findNft(params.id)

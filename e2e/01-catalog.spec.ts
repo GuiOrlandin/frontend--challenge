@@ -43,7 +43,7 @@ async function search(page: Page, isMobile: boolean, text: string) {
 
 test('lista a primeira página com os mais recentes', async ({ page }) => {
   await page.goto('/')
-  await expect(cardTitles(page)).toHaveCount(12)
+  await expect(cardTitles(page)).toHaveCount(9)
   await expect(cardTitles(page).first()).toHaveText('Emerald Ape #042')
   await expectGrid(page, '')
 })
@@ -57,11 +57,17 @@ test('busca filtra o catálogo e vai para a URL', async ({ page, isMobile }) => 
   await expect(cardTitles(page).first()).toContainText('Nomad')
 })
 
-test('combina categoria e rede, e desfaz pelo mesmo botão', async ({ page, isMobile }) => {
+test('combina categoria e rede, uma de cada, e desfaz pelo mesmo botão', async ({
+  page,
+  isMobile,
+}) => {
   await page.goto('/')
   await expect(grid(page)).toBeVisible()
   const panel = await openFilters(page, isMobile)
+  await expect(panel.getByRole('button', { name: /^Solana/ })).toContainText('(9)')
   await panel.getByRole('button', { name: /^Arte digital/ }).click()
+  // Contagens reativas: nenhum Nft de Arte digital está em Solana.
+  await expect(panel.getByRole('button', { name: /^Solana/ })).toContainText('(0)')
   await panel.getByRole('button', { name: /^Ethereum/ }).click()
   await expect(panel.getByRole('button', { name: /^Ethereum/ })).toHaveAttribute(
     'aria-pressed',
@@ -74,8 +80,16 @@ test('combina categoria e rede, e desfaz pelo mesmo botão', async ({ page, isMo
   const again = await openFilters(page, isMobile)
   await again.getByRole('button', { name: /^Ethereum/ }).click()
   await expect(page).not.toHaveURL(/network=/)
+  // Uma coleção por vez: escolher outra substitui a atual.
+  await again.getByRole('button', { name: /^Música/ }).click()
+  await expect(page).toHaveURL(/category=.*musica/)
+  await expect(page).not.toHaveURL(/arte-digital/)
+  await expect(again.getByRole('button', { name: /^Arte digital/ })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  )
   await closeFilters(page, isMobile)
-  await expectGrid(page, 'category=arte-digital')
+  await expectGrid(page, 'category=musica')
 })
 
 test('faixa de preço aplica os limites escolhidos', async ({ page, isMobile }) => {
@@ -150,7 +164,7 @@ test('busca sem resultado mostra o vazio, e "Limpar filtros" volta ao catálogo'
   await page.goto('/?q=zzzz')
   await expect(page.getByText('Nenhum NFT encontrado')).toBeVisible()
   await page.getByRole('link', { name: 'Limpar filtros' }).click()
-  await expect(cardTitles(page)).toHaveCount(12)
+  await expect(cardTitles(page)).toHaveCount(9)
 })
 
 test('empty: catálogo vazio mostra o estado vazio', async ({ page }) => {
@@ -196,4 +210,66 @@ test('mobile: botão central da barra inferior abre os filtros', async ({ page, 
   await expect(sheet).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(sheet).toBeHidden()
+})
+
+test.describe('hero e destaque', () => {
+  const hero = (page: Page) => page.getByRole('region', { name: 'Destaques' })
+
+  test('carrossel troca a arte pelos pontos e pelas setas do teclado', async ({ page }) => {
+    await page.goto('/')
+    const dots = hero(page).getByRole('button', { name: /^Mostrar destaque/ })
+    await expect(dots).toHaveCount(3)
+    await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true')
+    await expect(hero(page).getByRole('link', { name: 'Emerald Ape #042' })).toBeVisible()
+
+    await dots.nth(1).click()
+    await expect(dots.nth(1)).toHaveAttribute('aria-current', 'true')
+    await expect(hero(page).getByRole('link', { name: 'Neon Vessel #552' })).toBeVisible()
+
+    await dots.nth(1).focus()
+    await page.keyboard.press('ArrowRight')
+    await expect(dots.nth(2)).toHaveAttribute('aria-current', 'true')
+    await expect(hero(page).getByRole('link', { name: 'Golden Beat #207' })).toBeVisible()
+    // As artes fora da tela ficam fora do foco e da leitura (`inert`).
+    await expect(hero(page).getByRole('group', { name: '1 de 3' })).toHaveAttribute('inert')
+    await expect(hero(page).getByRole('group', { name: '3 de 3' })).not.toHaveAttribute('inert')
+  })
+
+  test('destaque leva ao detalhe do Nft', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'O destaque fica na coluna dos filtros, só no desktop')
+    await page.goto('/')
+    const spotlight = page.getByRole('region', { name: 'NFT em destaque' })
+    await spotlight.getByRole('link', { name: 'Sage Nomad #009' }).click()
+    await expect(page).toHaveURL(/\/nft\/nft_002$/)
+  })
+
+  test('empty: sem artes nem destaque, e o texto do hero continua', async ({ page }) => {
+    await page.goto('/?scenario=empty')
+    await expect(page.getByText('Nenhum NFT encontrado')).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Seja dono d/i })).toBeVisible()
+    await expect(hero(page).getByRole('button', { name: /^Mostrar destaque/ })).toHaveCount(0)
+    await expect(page.getByRole('region', { name: 'NFT em destaque' })).toHaveCount(0)
+  })
+
+  test('carregar a Início não desloca o layout (CLS ≈ 0)', async ({ page }) => {
+    await page.goto('/')
+    await expect(grid(page)).toBeVisible()
+    await expect(hero(page).getByRole('link', { name: 'Emerald Ape #042' })).toBeVisible()
+    const cls = await page.evaluate(
+      () =>
+        new Promise<number>((resolve) => {
+          let total = 0
+          new PerformanceObserver((list) => {
+            for (const entry of list.getEntries() as (PerformanceEntry & {
+              value: number
+              hadRecentInput: boolean
+            })[]) {
+              if (!entry.hadRecentInput) total += entry.value
+            }
+          }).observe({ type: 'layout-shift', buffered: true })
+          setTimeout(() => resolve(total), 500)
+        }),
+    )
+    expect(cls).toBeLessThan(0.1)
+  })
 })

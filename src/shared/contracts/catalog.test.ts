@@ -52,7 +52,7 @@ describe('normalizeCatalogParams', () => {
       pageSize: 8,
       collection: 'col_01',
     })
-    expect(normalizeCatalogParams({ pageSize: 12 })).toEqual({})
+    expect(normalizeCatalogParams({ pageSize: 9 })).toEqual({})
   })
 
   it('drops blank price bounds and a whitespace-only search', () => {

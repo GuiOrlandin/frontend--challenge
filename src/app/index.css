@@ -32,6 +32,9 @@
   --border: oklch(0.3162 0.0449 58.26); /* #432C1A */
   --input: oklch(0.3162 0.0449 58.26);
   --ring: oklch(0.6948 0.1177 59.7);
+  /* Opções dos filtros (Coleções, Rede): normal e selecionada. */
+  --option: oklch(0.7794 0.0612 74.2); /* #CFB28C */
+  --option-active: oklch(0.7526 0.1261 61.21); /* #E89B55 */
 }
 
 @theme inline {
@@ -62,6 +65,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-option: var(--option);
+  --color-option-active: var(--option-active);
 
   --animate-shimmer: shimmer 1.6s linear infinite;
 
@@ -85,5 +90,12 @@
   }
   body {
     @apply bg-background font-mono text-foreground antialiased;
+  }
+  /* O Tailwind v4 tirou o `cursor: pointer` dos botões; os estáticos (aria-disabled) ficam sem. */
+  button:not(:disabled, [aria-disabled='true']),
+  [role='button']:not([aria-disabled='true']),
+  [role='option'],
+  [role='menuitem'] {
+    cursor: pointer;
   }
 }

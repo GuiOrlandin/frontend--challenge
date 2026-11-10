@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Nft } from '@/shared/contracts'
 
-import { parseCatalogQuery, queryCatalog } from './catalog'
+import { computeFacets, parseCatalogQuery, queryCatalog } from './catalog'
 
 const NOW = '2026-07-29T12:00:00.000Z'
 
@@ -35,18 +35,18 @@ const day = (n: number) => `2026-07-${String(n).padStart(2, '0')}T00:00:00.000Z`
 const ids = (page: { items: Nft[] }) => page.items.map((item) => item.id)
 
 describe('queryCatalog', () => {
-  it('lists the most recent first, 12 per page, with page metadata', () => {
+  it('lists the most recent first, 9 per page, with page metadata', () => {
     const nfts = Array.from({ length: 14 }, (_, i) => nft(`n${i + 1}`, { createdAt: day(i + 1) }))
 
     const first = queryCatalog(nfts, {}, { now: NOW })
 
-    expect(first.items).toHaveLength(12)
+    expect(first.items).toHaveLength(9)
     expect(first.items[0]?.id).toBe('n14')
-    expect(first.items[11]?.id).toBe('n3')
-    expect(first).toMatchObject({ page: 1, pageSize: 12, total: 14, totalPages: 2 })
+    expect(first.items[8]?.id).toBe('n6')
+    expect(first).toMatchObject({ page: 1, pageSize: 9, total: 14, totalPages: 2 })
 
     const second = queryCatalog(nfts, { page: 2 }, { now: NOW })
-    expect(ids(second)).toEqual(['n2', 'n1'])
+    expect(ids(second)).toEqual(['n5', 'n4', 'n3', 'n2', 'n1'])
   })
 
   it('searches title, collection and creator ignoring case and accents', () => {
@@ -148,7 +148,7 @@ describe('queryCatalog', () => {
     expect(queryCatalog(nfts, { page: 3 }, { now: NOW })).toEqual({
       items: [],
       page: 3,
-      pageSize: 12,
+      pageSize: 9,
       total: 2,
       totalPages: 1,
     })
@@ -193,5 +193,53 @@ describe('parseCatalogQuery', () => {
       tab: 'trending',
       collection: 'nomads',
     })
+  })
+})
+
+describe('computeFacets', () => {
+  const CATEGORIES = [
+    { id: 'arte-digital', label: 'Arte digital' },
+    { id: 'musica', label: 'Música' },
+  ]
+  const LABELS = { ethereum: 'Ethereum', polygon: 'Polygon', solana: 'Solana' } as const
+  const nfts = [
+    nft('a', { price: '0.50' }),
+    nft('b', { category: { id: 'musica', label: 'Música' }, network: 'solana', price: '2' }),
+    nft('c', { network: 'solana', price: '9', title: 'Emerald Ape' }),
+  ]
+  const counts = (facets: ReturnType<typeof computeFacets>) => ({
+    categories: Object.fromEntries(facets.categories.map((f) => [f.id, f.count])),
+    networks: Object.fromEntries(facets.networks.map((f) => [f.id, f.count])),
+  })
+
+  it('counts the whole catalog without filters', () => {
+    expect(counts(computeFacets(nfts, CATEGORIES, LABELS, {}, { now: NOW }))).toEqual({
+      categories: { 'arte-digital': 2, musica: 1 },
+      networks: { ethereum: 1, polygon: 0, solana: 2 },
+    })
+  })
+
+  it('counts each group under the other active filters, ignoring its own selection', () => {
+    const facets = computeFacets(
+      nfts,
+      CATEGORIES,
+      LABELS,
+      { category: ['musica'], network: ['ethereum'] },
+      { now: NOW },
+    )
+    // Coleções contam só Ethereum; Rede conta só Música.
+    expect(counts(facets)).toEqual({
+      categories: { 'arte-digital': 1, musica: 0 },
+      networks: { ethereum: 0, polygon: 0, solana: 1 },
+    })
+  })
+
+  it('applies search, tab and price to both groups, but keeps the price range global', () => {
+    const facets = computeFacets(nfts, CATEGORIES, LABELS, { q: 'emerald' }, { now: NOW })
+    expect(counts(facets)).toEqual({
+      categories: { 'arte-digital': 1, musica: 0 },
+      networks: { ethereum: 0, polygon: 0, solana: 1 },
+    })
+    expect(facets.priceRange).toEqual({ min: '0.50', max: '9' })
   })
 })

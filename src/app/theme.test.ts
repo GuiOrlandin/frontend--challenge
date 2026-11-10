@@ -64,6 +64,10 @@ describe('theme tokens', () => {
     ['destructive', 'background'],
     ['destructive', 'card'],
     ['primary-foreground', 'destructive'],
+    ['option', 'card'],
+    ['option', 'accent'],
+    ['option-active', 'card'],
+    ['option-active', 'accent'],
   ] as const
 
   it.each(textPairs)('%s on %s reaches 4.5:1', (text, bg) => {
