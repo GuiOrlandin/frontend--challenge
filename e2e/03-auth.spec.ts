@@ -48,9 +48,13 @@ test('session-expired ao navegar para uma página privada pede login e volta par
   page,
   loginAs,
   isMobile,
+  mock,
 }) => {
-  await page.goto('/?scenario=session-expired')
+  await page.goto('/')
   await loginAs('ana')
+  // Vence depois do boot: o cenário `session-expired` cairia já no `GET /cart` do header.
+  await page.waitForLoadState('networkidle')
+  await mock.expireSession()
 
   if (isMobile) {
     await page.getByRole('link', { name: 'Perfil' }).click()

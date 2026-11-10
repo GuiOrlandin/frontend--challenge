@@ -1,10 +1,115 @@
-import { PageContainer } from '@/shared/components/PageContainer'
+import { useIsMutating, useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import { useState } from 'react'
 
-// Provisória (task 26): o conteúdo vem na task da tela.
+import { catalogQueries } from '@/modules/catalog'
+import { EmptyState } from '@/shared/components/EmptyState'
+import { NftCarousel } from '@/shared/components/NftCarousel'
+import { PageContainer } from '@/shared/components/PageContainer'
+import { Button } from '@/shared/ui/button'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/shared/ui/breadcrumb'
+
+import { CartChangesAnnouncer } from '../../components/CartChangesAnnouncer'
+import { CartLine } from '../../components/CartLine'
+import { CartSummary } from '../../components/CartSummary'
+import { CART_MUTATION, useCart } from '../../hooks/useCart'
+
+/** Carrinho já carregado pelo loader (SPEC §11.4); quantidade, cupom e tempo real no mesmo cache. */
 export function CartPage() {
+  const { data: cart } = useCart()
+  const updating = useIsMutating({ mutationKey: CART_MUTATION }) > 0
+  const [highlighted, setHighlighted] = useState<string[]>([])
+  const trending = useQuery(catalogQueries.list({ tab: 'trending', pageSize: 8 }))
+
   return (
-    <PageContainer className="py-10">
-      <h1 className="text-2xl font-bold">Carrinho</h1>
+    <PageContainer className="flex flex-col gap-6 py-6 lg:pt-10 lg:pb-8">
+      <Breadcrumb>
+        <BreadcrumbList className="text-sm font-bold text-foreground">
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/">Início</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>/</BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" hash="catalogo">
+                Mercado
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>/</BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbPage className="font-bold">Carrinho</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      {/* Recebe o foco quando a linha que o tinha é removida. */}
+      <h1 id="carrinho" tabIndex={-1} className="sr-only">
+        Carrinho
+      </h1>
+
+      {cart.lines.length === 0 ? (
+        <EmptyState
+          title="Seu carrinho está vazio"
+          description="Explore o mercado e adicione NFTs para continuar."
+          action={
+            <Button asChild>
+              <Link to="/" hash="catalogo">
+                Explorar o mercado
+              </Link>
+            </Button>
+          }
+        />
+      ) : (
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_19.5rem] lg:gap-20">
+          <section aria-labelledby="itens" className="flex min-w-0 flex-col gap-3">
+            <h2 id="itens" className="sr-only">
+              Itens
+            </h2>
+            <div
+              aria-hidden
+              className="hidden grid-cols-[4rem_minmax(0,1fr)_6.5rem_7rem_6.5rem_2.5rem] gap-x-3 border-b pb-2 text-sm font-bold md:grid"
+            >
+              <span className="col-span-2">NFTs</span>
+              <span>Preço</span>
+              <span>Edições</span>
+              <span>Total</span>
+            </div>
+            <CartChangesAnnouncer lines={cart.lines} onHighlight={setHighlighted} />
+            {/* Cupom vencido removido pelo servidor (SPEC §7); a região já existe antes do aviso. */}
+            <div role="status" className="text-sm text-primary empty:sr-only">
+              {cart.notices?.map((notice) => (
+                <p key={notice.code}>{notice.message}</p>
+              ))}
+            </div>
+            <ul aria-label="Itens do carrinho" className="flex flex-col gap-2.5">
+              {cart.lines.map((line) => (
+                <CartLine
+                  key={line.lineId}
+                  line={line}
+                  highlighted={highlighted.includes(line.lineId)}
+                />
+              ))}
+            </ul>
+          </section>
+          <CartSummary cart={cart} updating={updating} />
+        </div>
+      )}
+
+      {/* Complementar: sem dados ou com erro, a vitrine some. */}
+      {trending.data && trending.data.items.length > 0 && (
+        <div className="mt-10 lg:mt-16">
+          <NftCarousel title="Colecionadores também viram" nfts={trending.data.items} />
+        </div>
+      )}
     </PageContainer>
   )
 }

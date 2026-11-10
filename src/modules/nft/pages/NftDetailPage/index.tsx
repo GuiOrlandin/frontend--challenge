@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Link, useParams } from '@tanstack/react-router'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useState } from 'react'
 
+import { AddToCartButton, useAddToCart } from '@/modules/cart'
 import { EthPrice } from '@/shared/components/EthPrice'
 import { PageContainer } from '@/shared/components/PageContainer'
 import { QuantityStepper } from '@/shared/components/QuantityStepper'
@@ -69,6 +70,8 @@ function Purchase({ nft }: { nft: Nft }) {
   const [editionId, setEditionId] = useState(nft.defaultEditionId)
   const [quantity, setQuantity] = useState(1)
   const [announcement, setAnnouncement] = useState('')
+  const addToCart = useAddToCart()
+  const navigate = useNavigate()
 
   const edition = nft.editions.find((e) => e.id === editionId) ?? nft.editions[0]
   const soldOut = !edition || edition.available === 0
@@ -114,13 +117,29 @@ function Purchase({ nft }: { nft: Nft }) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <QuantityStepper value={qty} onChange={setQuantity} max={max} disabled={soldOut} />
           <div className="flex flex-wrap items-center gap-2">
-            {/* shortcut: só o visual; a task 33 liga "Comprar" ao carrinho e tira o aria-disabled. */}
+            {/* "Comprar" adiciona e vai ao carrinho; o ícone só adiciona (SPEC §13.6). */}
             <Button
-              aria-disabled="true"
+              disabled={soldOut || addToCart.isPending}
+              aria-busy={addToCart.isPending}
+              onClick={() =>
+                edition &&
+                addToCart.mutate(
+                  { nftId: nft.id, editionId: edition.id, quantity: qty },
+                  { onSuccess: () => void navigate({ to: '/carrinho' }) },
+                )
+              }
               className="h-9 rounded-sm px-8 text-xs font-bold uppercase"
             >
               Comprar
             </Button>
+            {edition && !soldOut && (
+              <AddToCartButton
+                nftId={nft.id}
+                editionId={edition.id}
+                quantity={qty}
+                className="rounded-sm border border-primary bg-transparent hover:bg-accent"
+              />
+            )}
             <FavoriteButton
               nftId={nft.id}
               showLabel

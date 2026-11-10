@@ -3,11 +3,13 @@ import { Link, type LinkProps } from '@tanstack/react-router'
 
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg?react'
 import ChevronRightIcon from '@/assets/icons/chevron-right.svg?react'
+import SearchIcon from '@/assets/icons/search.svg?react'
+import { AddToCartButton } from '@/modules/cart'
 import { FavoriteButton } from '@/modules/nft'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { ErrorState } from '@/shared/components/ErrorState'
 import { NftCard } from '@/shared/components/NftCard'
-import { CATALOG_DEFAULTS, isApiError } from '@/shared/contracts'
+import { CATALOG_DEFAULTS, isApiError, type Nft } from '@/shared/contracts'
 import { cn } from '@/shared/lib/utils'
 import { buttonVariants } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
@@ -80,7 +82,7 @@ export function CatalogGrid({ search }: CatalogGridProps) {
       <ul aria-label="NFTs" className={GRID}>
         {items.map((nft, index) => (
           <li key={nft.id}>
-            <NftCard nft={nft} priority={index < 3} actions={<FavoriteButton nftId={nft.id} />} />
+            <NftCard nft={nft} priority={index < 3} actions={<CardActions nft={nft} />} />
           </li>
         ))}
       </ul>
@@ -150,5 +152,27 @@ function CatalogPagination({ page, totalPages }: { page: number; totalPages: num
         )}
       </ul>
     </nav>
+  )
+}
+
+/** Carrinho (Edição padrão), favoritar e ver detalhe, na base da imagem (Figma). */
+function CardActions({ nft }: { nft: Nft }) {
+  return (
+    <>
+      <AddToCartButton
+        nftId={nft.id}
+        editionId={nft.defaultEditionId}
+        className="size-7 rounded-sm bg-card text-[#F5F1EB]"
+      />
+      <FavoriteButton nftId={nft.id} className="size-7 rounded-sm bg-card text-[#F5F1EB]" />
+      <Link
+        to="/nft/$nftId"
+        params={{ nftId: nft.id }}
+        aria-label={`Ver detalhes de ${nft.title}`}
+        className="flex size-7 items-center justify-center rounded-sm bg-card text-[#F5F1EB] transition-colors hover:bg-background focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
+      >
+        <SearchIcon className="size-5" aria-hidden />
+      </Link>
+    </>
   )
 }

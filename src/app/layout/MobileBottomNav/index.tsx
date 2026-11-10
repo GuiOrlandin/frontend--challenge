@@ -5,6 +5,7 @@ import FiltersIcon from '@/assets/icons/filters.svg?react'
 import HeartIcon from '@/assets/icons/heart-filled.svg?react'
 import HomeIcon from '@/assets/icons/home-filled.svg?react'
 import UserIcon from '@/assets/icons/user-filled.svg?react'
+import { CartBadge } from '@/modules/cart'
 import { cn } from '@/shared/lib/utils'
 
 const navItemClass = (active: boolean) =>
@@ -52,13 +53,9 @@ export function MobileBottomNav() {
           </Link>
         </li>
         <li>
-          <Link
-            to="/carrinho"
-            aria-label="Carrinho"
-            className={navItemClass(pathname.startsWith('/carrinho'))}
-          >
+          <CartBadge className={navItemClass(pathname.startsWith('/carrinho'))}>
             <CartIcon className="size-5" />
-          </Link>
+          </CartBadge>
         </li>
         <li>
           <Link

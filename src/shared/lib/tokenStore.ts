@@ -26,6 +26,14 @@ function write(kind: TokenKind, value: string | null): void {
   }
 }
 
+const cartTokenListeners = new Set<() => void>()
+
+function writeCartToken(value: string | null) {
+  if (read('cart') === value) return
+  write('cart', value)
+  cartTokenListeners.forEach((listener) => listener())
+}
+
 export const tokenStore = {
   /** Chave usada no listener de `storage` entre abas. */
   sessionKey: KEYS.session,
@@ -33,6 +41,11 @@ export const tokenStore = {
   setSessionToken: (token: string) => write('session', token),
   clearSessionToken: () => write('session', null),
   getCartToken: () => read('cart'),
-  setCartToken: (token: string) => write('cart', token),
-  clearCartToken: () => write('cart', null),
+  setCartToken: (token: string) => writeCartToken(token),
+  clearCartToken: () => writeCartToken(null),
+  /** Para `useSyncExternalStore`: a key do carrinho do Visitante muda quando o token nasce. */
+  subscribeCartToken(listener: () => void) {
+    cartTokenListeners.add(listener)
+    return () => void cartTokenListeners.delete(listener)
+  },
 }

@@ -1,21 +1,11 @@
-import { Link } from '@tanstack/react-router'
-
 import CartIcon from '@/assets/icons/cart.svg?react'
 import { AccountMenu, AuthDialog, useSessionSync } from '@/modules/auth'
+import { CartBadge } from '@/modules/cart'
 import { Toaster } from '@/shared/ui/sonner'
 
 import { Footer } from '../Footer'
 import { Header } from '../Header'
 import { MobileBottomNav } from '../MobileBottomNav'
-
-/** Provisório até o `CartBadge` (task do carrinho): só o link, sem contador. */
-function CartSlot() {
-  return (
-    <Link to="/carrinho" aria-label="Carrinho" className="rounded-sm p-1 hover:text-primary">
-      <CartIcon className="size-5" />
-    </Link>
-  )
-}
 
 /**
  * Moldura de todas as rotas (entra como `InnerWrap` do router, então o 404 também tem layout).
@@ -31,7 +21,14 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
       >
         Pular para o conteúdo
       </a>
-      <Header cart={<CartSlot />} account={<AccountMenu />} />
+      <Header
+        cart={
+          <CartBadge className="rounded-sm p-1 hover:text-primary">
+            <CartIcon className="size-5" />
+          </CartBadge>
+        }
+        account={<AccountMenu />}
+      />
       <main id="conteudo" tabIndex={-1} className="flex-1 outline-none">
         {children}
       </main>
