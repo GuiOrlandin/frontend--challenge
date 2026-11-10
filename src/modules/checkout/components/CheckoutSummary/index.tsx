@@ -66,7 +66,7 @@ export function CheckoutSummary({ cart, quote }: CheckoutSummaryProps) {
         {!quote && (
           <p className="text-center text-xs">
             Tem um código promocional?{' '}
-            <Link to="/carrinho" className="text-primary hover:underline">
+            <Link to="/carrinho" className="text-primary underline underline-offset-2">
               Aplique aqui
             </Link>
           </p>

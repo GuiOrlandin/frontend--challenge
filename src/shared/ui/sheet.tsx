@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useReturnFocus } from '@/shared/lib/useReturnFocus'
 import { cn } from '@/shared/lib/utils'
 import XIcon from '@/assets/icons/x.svg?react'
 import { Dialog as SheetPrimitive } from 'radix-ui'
@@ -40,11 +41,14 @@ function SheetContent({
   children,
   side = 'right',
   showCloseButton = true,
+  onOpenAutoFocus,
+  onCloseAutoFocus,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: 'top' | 'right' | 'bottom' | 'left'
   showCloseButton?: boolean
 }) {
+  const focus = useReturnFocus(onOpenAutoFocus, onCloseAutoFocus)
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -63,6 +67,7 @@ function SheetContent({
           className,
         )}
         {...props}
+        {...focus}
       >
         {children}
         {showCloseButton && (

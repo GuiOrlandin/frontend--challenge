@@ -10,10 +10,11 @@ import WalletIcon from '@/assets/icons/nav-wallet.svg?react'
 import WishlistIcon from '@/assets/icons/nav-wishlist.svg?react'
 import { useLogout } from '@/modules/auth'
 
+// Inativos em `option` (#CFB28C): o laranja a 75% do Figma não dá 4,5:1 sobre o `card`.
 const itemClass =
-  'flex shrink-0 items-center gap-3 whitespace-nowrap border-transparent px-4 py-3 text-sm text-primary/75 max-lg:border-b-2 lg:border-l-2'
+  'flex shrink-0 items-center gap-3 whitespace-nowrap border-transparent px-4 py-3 text-sm max-lg:border-b-2 lg:border-l-2'
 // O `Link` marca `data-status="active"`; o `activeProps` só concatenaria classes em conflito.
-const linkClass = `${itemClass} hover:text-primary data-[status=active]:border-primary data-[status=active]:text-primary`
+const linkClass = `${itemClass} text-option hover:text-primary data-[status=active]:border-primary data-[status=active]:text-primary`
 
 /** Itens sem tela (SPEC §1): aparecem, sem ação. */
 const STATIC_ITEMS = [
@@ -46,7 +47,7 @@ export function ProfileNav() {
         </li>
         {STATIC_ITEMS.map(({ label, Icon }) => (
           <li key={label}>
-            <span className={itemClass}>
+            <span className={`${itemClass} text-option`}>
               <Icon className="size-4" />
               {label}
             </span>

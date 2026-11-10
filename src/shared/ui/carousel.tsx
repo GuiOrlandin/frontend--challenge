@@ -50,6 +50,8 @@ function Carousel({
 }: React.ComponentProps<'div'> & CarouselProps) {
   const [carouselRef, api] = useEmblaCarousel(
     {
+      // Rolagem instantânea com movimento reduzido (`duration: 0` é salto no Embla).
+      breakpoints: { '(prefers-reduced-motion: reduce)': { duration: 0 } },
       ...opts,
       axis: orientation === 'horizontal' ? 'x' : 'y',
     },

@@ -98,4 +98,15 @@
   [role='menuitem'] {
     cursor: pointer;
   }
+  /* Sem movimento com `prefers-reduced-motion` (SPEC §13.5): entrada/saída de Dialog, Sheet e toasts
+     terminam na hora; `animationend` ainda dispara, então o Radix desmonta normalmente. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
