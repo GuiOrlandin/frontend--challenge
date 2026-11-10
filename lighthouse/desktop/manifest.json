@@ -1,0 +1,80 @@
+[
+  {
+    "url": "http://localhost:4173/",
+    "isRepresentativeRun": false,
+    "htmlPath": "localhost--2026_11_10_19_54_24.report.html",
+    "jsonPath": "localhost--2026_11_10_19_54_24.report.json",
+    "summary": {
+      "performance": 0.99,
+      "accessibility": 0.96,
+      "best-practices": 1,
+      "seo": 1,
+      "agentic-browsing": 0.5
+    }
+  },
+  {
+    "url": "http://localhost:4173/",
+    "isRepresentativeRun": false,
+    "htmlPath": "localhost--2026_11_10_19_54_38.report.html",
+    "jsonPath": "localhost--2026_11_10_19_54_38.report.json",
+    "summary": {
+      "performance": 0.99,
+      "accessibility": 0.96,
+      "best-practices": 1,
+      "seo": 1,
+      "agentic-browsing": 0.5
+    }
+  },
+  {
+    "url": "http://localhost:4173/nft/nft_001",
+    "isRepresentativeRun": false,
+    "htmlPath": "localhost-nft_nft_001-2026_11_10_19_55_04.report.html",
+    "jsonPath": "localhost-nft_nft_001-2026_11_10_19_55_04.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1,
+      "agentic-browsing": 0.5
+    }
+  },
+  {
+    "url": "http://localhost:4173/nft/nft_001",
+    "isRepresentativeRun": false,
+    "htmlPath": "localhost-nft_nft_001-2026_11_10_19_55_17.report.html",
+    "jsonPath": "localhost-nft_nft_001-2026_11_10_19_55_17.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1,
+      "agentic-browsing": 0.5
+    }
+  },
+  {
+    "url": "http://localhost:4173/",
+    "isRepresentativeRun": true,
+    "htmlPath": "localhost--2026_11_10_19_54_51.report.html",
+    "jsonPath": "localhost--2026_11_10_19_54_51.report.json",
+    "summary": {
+      "performance": 0.99,
+      "accessibility": 0.96,
+      "best-practices": 1,
+      "seo": 1,
+      "agentic-browsing": 0.5
+    }
+  },
+  {
+    "url": "http://localhost:4173/nft/nft_001",
+    "isRepresentativeRun": true,
+    "htmlPath": "localhost-nft_nft_001-2026_11_10_19_55_30.report.html",
+    "jsonPath": "localhost-nft_nft_001-2026_11_10_19_55_30.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1,
+      "agentic-browsing": 0.5
+    }
+  }
+]
