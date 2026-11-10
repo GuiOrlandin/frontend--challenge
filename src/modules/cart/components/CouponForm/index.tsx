@@ -72,10 +72,11 @@ export function CouponForm({ coupon }: CouponFormProps) {
         if (code) apply.mutate(code)
       }}
     >
-      <Label htmlFor={id} className="text-xs font-bold">
+      <Label htmlFor={id} className="text-xs font-bold max-md:sr-only">
         Código promocional
       </Label>
-      <div className="flex">
+      {/* Mobile: pílula escura com o botão dentro (frame mobile). */}
+      <div className="flex max-md:rounded-full max-md:bg-background max-md:p-0.5">
         <Input
           id={id}
           name="code"
@@ -84,13 +85,13 @@ export function CouponForm({ coupon }: CouponFormProps) {
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
           onChange={() => apply.error && apply.reset()}
-          className="h-10 rounded-r-none border-primary bg-transparent text-xs dark:bg-transparent"
+          className="h-10 rounded-r-none border-primary bg-transparent text-xs dark:bg-transparent max-md:rounded-l-full max-md:border-0 max-md:pl-4"
         />
         <Button
           type="submit"
           aria-busy={apply.isPending}
           disabled={apply.isPending}
-          className="h-10 rounded-l-none px-5 text-sm font-bold"
+          className="h-10 rounded-l-none px-5 text-sm font-bold max-md:rounded-full"
         >
           Aplicar
         </Button>

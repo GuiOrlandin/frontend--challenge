@@ -32,8 +32,12 @@ export function CartSummary({ cart, updating }: CartSummaryProps) {
   }
 
   return (
-    <section aria-labelledby="resumo" className="flex flex-col gap-4">
-      <h2 id="resumo" className="border-b pb-3 text-base font-bold">
+    // Mobile: painel arredondado colado às bordas (sem título visível nem "Continuar explorando").
+    <section
+      aria-labelledby="resumo"
+      className="flex flex-col gap-4 max-md:-mx-4 max-md:rounded-t-3xl max-md:bg-card max-md:px-4 max-md:pt-5 max-md:pb-8"
+    >
+      <h2 id="resumo" className="border-b pb-3 text-base font-bold max-md:sr-only">
         Resumo da carteira
       </h2>
       <CouponForm coupon={cart.coupon} />
@@ -65,7 +69,7 @@ export function CartSummary({ cart, updating }: CartSummaryProps) {
         </div>
       </dl>
       <Button
-        className="h-10 rounded-sm text-sm font-bold"
+        className="h-10 rounded-sm text-sm font-bold max-md:mt-2 max-md:h-12 max-md:rounded-full max-md:bg-linear-to-r max-md:from-primary max-md:to-[#A86D3D]"
         aria-disabled={blocked || updating || undefined}
         aria-describedby={blocked && cart.lines.length > 0 ? 'checkout-bloqueado' : undefined}
         onClick={() => !blocked && !updating && checkout()}
@@ -77,7 +81,11 @@ export function CartSummary({ cart, updating }: CartSummaryProps) {
           Ajuste ou remova os itens indisponíveis para continuar.
         </p>
       )}
-      <Link to="/" hash="catalogo" className="self-center text-sm text-primary hover:underline">
+      <Link
+        to="/"
+        hash="catalogo"
+        className="self-center text-sm text-primary hover:underline max-md:hidden"
+      >
         Continuar explorando
       </Link>
     </section>
