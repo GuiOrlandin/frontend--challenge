@@ -31,12 +31,12 @@ export function QuantityStepper({
     <div
       role="group"
       aria-label={label}
-      className={cn('inline-flex items-center gap-1', className)}
+      className={cn('inline-flex items-center gap-2', className)}
     >
       <Button
         type="button"
-        variant="outline"
-        size="icon-sm"
+        size="icon"
+        className="h-9 w-7 rounded-full disabled:opacity-60 [&_svg]:size-5 [&_svg]:stroke-[2.5]"
         aria-label="Diminuir quantidade"
         disabled={disabled || value <= min}
         onClick={() => commit(value - 1)}
@@ -54,12 +54,12 @@ export function QuantityStepper({
         onKeyDown={(event) => {
           if (event.key === 'Enter' && draft !== null) commit(Number.parseInt(draft, 10))
         }}
-        className="h-8 w-10 rounded-sm border border-input bg-transparent text-center text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50"
+        className="h-9 w-8 rounded-sm bg-transparent text-center text-lg outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50"
       />
       <Button
         type="button"
-        variant="outline"
-        size="icon-sm"
+        size="icon"
+        className="h-9 w-7 rounded-full disabled:opacity-60 [&_svg]:size-5 [&_svg]:stroke-[2.5]"
         aria-label="Aumentar quantidade"
         disabled={disabled || value >= max}
         onClick={() => commit(value + 1)}

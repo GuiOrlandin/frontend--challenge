@@ -9,6 +9,7 @@ import { clampQuantity } from '@/shared/components/QuantityStepper/clampQuantity
 import type { Edition, Nft } from '@/shared/contracts'
 import { compare, formatEth, mulQty } from '@/shared/lib/eth'
 import { useRealtimeEvent } from '@/shared/lib/realtime'
+import { Button } from '@/shared/ui/button'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -32,15 +33,15 @@ export function NftDetailPage() {
   const { data: nft } = useSuspenseQuery(nftQueries.detail(nftId))
 
   return (
-    <PageContainer className="flex flex-col gap-10 py-6 lg:gap-16 lg:pt-12 lg:pb-8">
+    <PageContainer className="flex flex-col gap-6 py-6 lg:pt-10 lg:pb-8">
       <Breadcrumb>
-        <BreadcrumbList>
+        <BreadcrumbList className="text-sm font-bold text-foreground">
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link to="/">Início</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
+          <BreadcrumbSeparator>/</BreadcrumbSeparator>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link to="/" hash="catalogo">
@@ -48,15 +49,18 @@ export function NftDetailPage() {
               </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
+          <BreadcrumbSeparator>/</BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbPage>{nft.title}</BreadcrumbPage>
+            <BreadcrumbPage className="font-bold">{nft.title}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       {/* Outro Nft (vitrine) zera Edição e quantidade escolhidas. */}
       <Purchase key={nft.id} nft={nft} />
-      <Showcases nft={nft} />
+      <div className="mt-10 flex flex-col gap-16 lg:mt-14 lg:gap-20">
+        <NftInfo nft={nft} />
+        <Showcases nft={nft} />
+      </div>
     </PageContainer>
   )
 }
@@ -80,60 +84,79 @@ function Purchase({ nft }: { nft: Nft }) {
   })
 
   return (
-    <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+    <div className="grid gap-8 lg:grid-cols-2 lg:gap-8">
       <Gallery images={nft.images} rare={nft.rare} />
 
-      <div className="flex min-w-0 flex-col gap-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-2">
-            <p className="text-sm text-primary uppercase">{nft.collection.label}</p>
-            <h1 className="text-2xl font-medium uppercase lg:text-4xl">{nft.title}</h1>
-            <p className="text-sm text-muted-foreground">
-              Criado por <span className="text-foreground">{nft.creator.name}</span>
+      <div className="flex min-w-0 flex-col gap-3">
+        <h1 className="text-2xl font-bold lg:text-[28px] lg:leading-tight">{nft.title}</h1>
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b pb-2">
+          {edition && (
+            <p className="flex flex-wrap items-baseline gap-x-2 text-xl font-bold">
+              <EthPrice value={edition.price} className="text-primary" />
+              {edition.compareAtPrice && (
+                <s className="text-sm font-normal text-[#B0916A] no-underline">
+                  <span className="sr-only">Preço anterior: </span>
+                  <EthPrice value={edition.compareAtPrice} />
+                </s>
+              )}
             </p>
-            <Rating rating={nft.rating} />
-          </div>
-          <FavoriteButton nftId={nft.id} className="shrink-0 border" />
+          )}
+          <Rating rating={nft.rating} />
         </div>
 
-        {edition && (
-          <p className="flex flex-wrap items-baseline gap-x-3 text-2xl font-bold">
-            <EthPrice value={edition.price} className="text-primary" />
-            {edition.compareAtPrice && (
-              <s className="text-base font-normal text-muted-foreground">
-                <span className="sr-only">Preço anterior: </span>
-                <EthPrice value={edition.compareAtPrice} />
-              </s>
-            )}
-          </p>
-        )}
+        <section className="mt-1 flex flex-col gap-2">
+          <h2 className="text-sm font-bold">Sobre este NFT:</h2>
+          <p className="text-sm leading-[22px] text-option">{nft.description}</p>
+        </section>
 
         <EditionPicker editions={nft.editions} value={editionId} onChange={setEditionId} />
 
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <QuantityStepper value={qty} onChange={setQuantity} max={max} disabled={soldOut} />
-          {soldOut ? (
-            <p className="text-sm text-destructive">Edição esgotada</p>
-          ) : (
-            <p className="text-xs text-muted-foreground">Máximo de {max} por pedido</p>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* shortcut: só o visual; a task 33 liga "Comprar" ao carrinho e tira o aria-disabled. */}
+            <Button
+              aria-disabled="true"
+              className="h-9 rounded-sm px-8 text-xs font-bold uppercase"
+            >
+              Comprar
+            </Button>
+            <FavoriteButton
+              nftId={nft.id}
+              showLabel
+              className="h-9 w-auto gap-2 rounded-sm border border-primary bg-transparent px-3 text-[13px] text-option hover:bg-accent"
+            />
+          </div>
         </div>
-        {edition && !soldOut && (
-          <p className="text-sm">
-            Total: <EthPrice value={mulQty(edition.price, qty)} className="font-bold" />
-          </p>
+        {soldOut ? (
+          <p className="text-sm text-destructive">Edição esgotada</p>
+        ) : (
+          edition && (
+            <p className="text-xs text-option">
+              Total: <EthPrice value={mulQty(edition.price, qty)} className="font-bold" /> · máximo
+              de {max} por pedido
+            </p>
+          )
         )}
 
-        {/* Slot do carrinho (task 33): "Comprar" e o ícone de carrinho entram aqui. */}
-        <div className="flex flex-wrap items-center gap-3 empty:hidden" />
+        <dl className="flex flex-col gap-2.5 text-sm text-option">
+          {[
+            { label: 'ID do token', value: `#${nft.tokenId.padStart(4, '0')}` },
+            { label: 'Coleção', value: nft.collection.label },
+            { label: 'Atributos', value: nft.attributes.map((a) => a.value).join(', ') },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex gap-1">
+              <dt>{label}:</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
 
         <ShareLinks title={nft.title} />
 
         <p role="status" aria-live="polite" className="text-sm text-primary empty:hidden">
           {announcement}
         </p>
-
-        <NftInfo nft={nft} />
       </div>
     </div>
   )

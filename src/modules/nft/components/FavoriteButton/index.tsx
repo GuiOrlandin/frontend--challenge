@@ -17,7 +17,7 @@ import type { FavoriteButtonProps } from './types'
  * Favoritar com otimismo (SPEC §11.3): grava na hora, desfaz e avisa se a API falhar. O
  * Visitante é levado ao login.
  */
-export function FavoriteButton({ nftId, className }: FavoriteButtonProps) {
+export function FavoriteButton({ nftId, className, showLabel = false }: FavoriteButtonProps) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const session = useQuery(sessionQueries.current())
@@ -77,6 +77,7 @@ export function FavoriteButton({ nftId, className }: FavoriteButtonProps) {
       )}
     >
       <Icon className="size-5" aria-hidden />
+      {showLabel && <span aria-hidden>Favoritar</span>}
     </button>
   )
 }

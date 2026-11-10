@@ -165,47 +165,60 @@ function generatedCard(random: Random, index: number, usedTokens: Set<string>): 
 }
 
 /**
- * 1 a 3 Edições. A padrão (primeira) sempre tem estoque, e o preço dela segue o card; as
- * outras cobrem os casos de estoque: aberta, quase esgotada e esgotada.
+ * As 4 Edições do Figma (1/1, 1/10, 1/50, Aberta). A aberta é a padrão (primeira): sempre tem
+ * estoque e o preço dela segue o card; as outras cobrem quase esgotada e esgotada. Os sorteios
+ * são os mesmos de antes (e na mesma ordem), para o resto da seed não mudar.
  */
 function createEditions(random: Random, number: number, card: FigmaCard): Edition[] {
   const prefix = `ed_${String(number).padStart(3, '0')}`
   const open = random.chance(0.4)
   const standard: Edition = {
     id: `${prefix}_a`,
-    label: 'Padrão',
-    supply: open ? null : 100,
+    label: 'Aberta',
+    supply: null,
     available: open ? 999 : random.int(1, 100),
     price: eth(card.cents),
     ...(card.compareAtCents ? { compareAtPrice: eth(card.compareAtCents) } : {}),
     maxPerOrder: 5,
   }
-  const editions = [standard]
   const extra = random.int(0, 2)
 
+  let limitedAvailable = 25
   if (extra >= 1) {
     const stock = random.pick(['almostSoldOut', 'soldOut', 'healthy'] as const)
-    editions.push({
+    limitedAvailable =
+      stock === 'soldOut' ? 0 : stock === 'almostSoldOut' ? random.int(1, 3) : random.int(10, 50)
+  }
+  let collectorAvailable = 2
+  if (extra >= 2) collectorAvailable = random.chance(0.5) ? 0 : random.int(1, 2)
+
+  return [
+    standard,
+    {
       id: `${prefix}_b`,
       label: 'Limitada 1/50',
       supply: 50,
-      available:
-        stock === 'soldOut' ? 0 : stock === 'almostSoldOut' ? random.int(1, 3) : random.int(10, 50),
+      available: limitedAvailable,
       price: eth(Math.min(MAX_CENTS, Math.round(card.cents * 1.5))),
       maxPerOrder: 3,
-    })
-  }
-  if (extra >= 2) {
-    editions.push({
+    },
+    {
       id: `${prefix}_c`,
       label: 'Colecionador 1/10',
       supply: 10,
-      available: random.chance(0.5) ? 0 : random.int(1, 2),
+      available: collectorAvailable,
       price: eth(Math.min(MAX_CENTS, card.cents * 3)),
       maxPerOrder: 1,
-    })
-  }
-  return editions
+    },
+    {
+      id: `${prefix}_d`,
+      label: 'Única 1/1',
+      supply: 1,
+      available: 1,
+      price: eth(Math.min(MAX_CENTS, card.cents * 5)),
+      maxPerOrder: 1,
+    },
+  ]
 }
 
 function galleryFor(random: Random, main: Artwork, title: string): Nft['images'] {
