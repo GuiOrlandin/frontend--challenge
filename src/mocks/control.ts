@@ -2,7 +2,7 @@
 import type { Nft, RealtimeEvent } from '@/shared/contracts'
 
 import { db, type NftPatch } from './db'
-import { resetNetworkState } from './network'
+import { failNext, resetNetworkState } from './network'
 import { resetScenarioEvents } from './scenarioEvents'
 import { expireSessions } from './session'
 import {
@@ -11,6 +11,7 @@ import {
   readStoredScenario,
   SCENARIOS,
   setActiveScenario,
+  type RequestMatch,
   type ScenarioName,
 } from './scenarios'
 import { dropSockets, emitRealtime } from './ws'
@@ -71,6 +72,8 @@ export interface MockControl {
   emit(event: RealtimeEvent): void
   /** Derruba as conexões Socket.IO; o cliente reconecta sozinho. */
   dropSocket(): void
+  /** As próximas `count` chamadas que casam respondem 503 (falha pontual nos testes). */
+  failNext(match: RequestMatch, count?: number): void
 }
 
 export function installMockControl(target: Window & { __mock?: MockControl }) {
@@ -87,5 +90,6 @@ export function installMockControl(target: Window & { __mock?: MockControl }) {
     expireSession: expireSessions,
     emit: emitRealtime,
     dropSocket: dropSockets,
+    failNext,
   }
 }

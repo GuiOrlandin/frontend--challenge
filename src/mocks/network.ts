@@ -23,11 +23,18 @@ let random = createRandom(LATENCY_SEED)
 let unavailableCount = 0
 let outOfOrderSeq = 0
 const inFlight = new Map<number, Promise<void>>()
+/** Falhas pedidas pelos testes (`__mock.failNext`), fora de qualquer cenário. */
+let forcedFailures: { match: RequestMatch; remaining: number }[] = []
 
 /** Zera contadores e PRNG (troca de cenário e reset). */
 export function resetNetworkState() {
   random = createRandom(LATENCY_SEED)
   unavailableCount = 0
+  forcedFailures = []
+}
+
+export function failNext(match: RequestMatch, count = 1) {
+  forcedFailures.push({ match, remaining: count })
 }
 
 function matches(request: Request, match: RequestMatch): boolean {
@@ -66,6 +73,12 @@ export const networkHandler = http.all(api('/*'), async ({ request }) => {
   }
 
   if (network.offline) return HttpResponse.error()
+
+  const forced = forcedFailures.find((f) => f.remaining > 0 && matches(request, f.match))
+  if (forced) {
+    forced.remaining -= 1
+    return apiError(503, 'TEMPORARILY_UNAVAILABLE', 'Serviço temporariamente indisponível.')
+  }
 
   if (network.unavailable && matches(request, network.unavailable.match)) {
     if (unavailableCount < network.unavailable.first) {

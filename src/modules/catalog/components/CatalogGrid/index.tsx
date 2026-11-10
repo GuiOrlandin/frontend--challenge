@@ -3,6 +3,7 @@ import { Link, type LinkProps } from '@tanstack/react-router'
 
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg?react'
 import ChevronRightIcon from '@/assets/icons/chevron-right.svg?react'
+import { FavoriteButton } from '@/modules/nft'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { ErrorState } from '@/shared/components/ErrorState'
 import { NftCard } from '@/shared/components/NftCard'
@@ -79,7 +80,7 @@ export function CatalogGrid({ search }: CatalogGridProps) {
       <ul aria-label="NFTs" className={GRID}>
         {items.map((nft, index) => (
           <li key={nft.id}>
-            <NftCard nft={nft} priority={index < 3} />
+            <NftCard nft={nft} priority={index < 3} actions={<FavoriteButton nftId={nft.id} />} />
           </li>
         ))}
       </ul>
