@@ -1,11 +1,10 @@
 import { type FormEvent, useState } from 'react'
-import { z } from 'zod'
+import type { z } from 'zod'
 
 import { type AuthResponse, isApiError } from '@/shared/contracts'
+import { type FieldErrors, fieldErrorsOf, focusFirstInvalid } from '@/shared/lib/form'
 
 import { useSignIn } from './useSignIn'
-
-export type FieldErrors = Partial<Record<string, string>>
 
 /** Mensagem de falha sem campo, decidida pelo `code` (SPEC §5.5). */
 function formErrorOf(error: unknown): string {
@@ -32,22 +31,13 @@ export function useAuthForm<S extends z.ZodType>(
     const form = event.currentTarget
     const showFieldErrors = (errors: FieldErrors) => {
       setFieldErrors(errors)
-      const first = Array.from(form.elements).find(
-        (el): el is HTMLInputElement => el instanceof HTMLInputElement && !!errors[el.name],
-      )
-      first?.focus()
+      focusFirstInvalid(form, errors)
     }
 
     setFormError(undefined)
     const parsed = schema.safeParse(Object.fromEntries(new FormData(form)))
     if (!parsed.success) {
-      const issues = z.flattenError(parsed.error).fieldErrors as Record<
-        string,
-        string[] | undefined
-      >
-      showFieldErrors(
-        Object.fromEntries(Object.entries(issues).map(([key, list]) => [key, list?.[0]])),
-      )
+      showFieldErrors(fieldErrorsOf(parsed.error))
       return
     }
 

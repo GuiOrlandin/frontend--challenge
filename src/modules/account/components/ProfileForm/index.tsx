@@ -1,0 +1,194 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { type FormEvent, useId, useState } from 'react'
+import { toast } from 'sonner'
+
+import { changePasswordSchema, isApiError, profileSchema } from '@/shared/contracts'
+import { type FieldErrors, fieldErrorsOf, focusFirstInvalid } from '@/shared/lib/form'
+import { Button } from '@/shared/ui/button'
+import { Input } from '@/shared/ui/input'
+import { Label } from '@/shared/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
+
+import { changePassword, updateProfile } from '../../api'
+import { saveProfile } from '../../queries'
+import { AvatarField } from '../AvatarField'
+import { Field, inputClass } from '../Field'
+import type { ProfileFormProps } from './types'
+
+const ENS_SUFFIX = '.eth'
+const PASSWORD_KEYS = ['currentPassword', 'newPassword', 'confirmPassword'] as const
+
+/**
+ * Dados do perfil e troca de senha num "Salvar" só, como no Figma. A senha só vai se algum campo
+ * dela foi preenchido, e vai antes: se falhar, nada é salvo e o erro fica no campo.
+ */
+export function ProfileForm({ userId, profile }: ProfileFormProps) {
+  const queryClient = useQueryClient()
+  const ensId = useId()
+  const passwordGroupId = useId()
+  const [errors, setErrors] = useState<FieldErrors>({})
+  const [pending, setPending] = useState(false)
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const form = event.currentTarget
+    const show = (fieldErrors: FieldErrors) => {
+      setErrors(fieldErrors)
+      focusFirstInvalid(form, fieldErrors)
+    }
+
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>
+    // O sufixo vem do select; um ".eth" digitado não vira ".eth.eth".
+    const ensLabel = (data.ensName ?? '').trim().replace(/\.eth$/, '')
+    const profileResult = profileSchema.safeParse({
+      ...data,
+      ensName: ensLabel && `${ensLabel}${ENS_SUFFIX}`,
+    })
+    const wantsPassword = PASSWORD_KEYS.some((key) => data[key])
+    const passwordResult = wantsPassword ? changePasswordSchema.safeParse(data) : undefined
+    const clientErrors = {
+      ...(profileResult.success ? {} : fieldErrorsOf(profileResult.error)),
+      ...(passwordResult && !passwordResult.success ? fieldErrorsOf(passwordResult.error) : {}),
+    }
+    if (!profileResult.success || (passwordResult && !passwordResult.success)) {
+      show(clientErrors)
+      return
+    }
+
+    // Senha já trocada não pode ficar nos campos: reenviada, a "atual" estaria errada.
+    const clearPasswords = () =>
+      PASSWORD_KEYS.forEach((key) => {
+        const input = form.elements.namedItem(key)
+        if (input instanceof HTMLInputElement) input.value = ''
+      })
+
+    setErrors({})
+    setPending(true)
+    let passwordChanged = false
+    try {
+      if (passwordResult) {
+        await changePassword(passwordResult.data)
+        passwordChanged = true
+        clearPasswords()
+      }
+      saveProfile(queryClient, userId, await updateProfile(profileResult.data))
+      toast(passwordChanged ? 'Perfil e senha salvos' : 'Perfil salvo')
+    } catch (error) {
+      if (isApiError(error, 'SESSION_EXPIRED')) return
+      if (isApiError(error) && Object.keys(error.fieldErrors).length > 0) show(error.fieldErrors)
+      else toast.error('Não foi possível salvar. Tente novamente.')
+      if (passwordChanged) toast('A senha foi alterada; os dados do perfil não foram salvos.')
+    } finally {
+      setPending(false)
+    }
+  }
+
+  return (
+    <form noValidate onSubmit={(event) => void onSubmit(event)} className="grid gap-6">
+      <h1 className="font-bold">Perfil do colecionador</h1>
+
+      <div className="grid gap-x-7 gap-y-6 md:grid-cols-2">
+        <Field
+          name="displayName"
+          label="Nome de exibição"
+          required
+          autoComplete="name"
+          defaultValue={profile.displayName}
+          error={errors.displayName}
+        />
+        <Field
+          name="username"
+          label="Nome de usuário"
+          required
+          autoComplete="username"
+          defaultValue={profile.username}
+          error={errors.username}
+        />
+        <Field
+          name="email"
+          type="email"
+          label="E-mail"
+          required
+          autoComplete="email"
+          defaultValue={profile.email}
+          error={errors.email}
+        />
+
+        <div className="grid content-start gap-3">
+          <Label htmlFor={ensId} className="font-normal">
+            Nome ENS
+            <span aria-hidden="true" className="-ml-1.5 text-base leading-none text-primary">
+              *
+            </span>
+          </Label>
+          <div className="flex gap-2">
+            {/* Só `.eth` (SPEC §9): o select existe porque está no Figma. */}
+            <Select value={ENS_SUFFIX}>
+              <SelectTrigger aria-label="Domínio ENS" className="h-10! dark:bg-transparent">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ENS_SUFFIX}>{ENS_SUFFIX}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              id={ensId}
+              name="ensName"
+              aria-required
+              aria-invalid={errors.ensName ? true : undefined}
+              aria-describedby={errors.ensName ? `${ensId}-erro` : undefined}
+              defaultValue={profile.ensName.slice(0, -ENS_SUFFIX.length)}
+              className={inputClass}
+            />
+          </div>
+          {errors.ensName && (
+            <p id={`${ensId}-erro`} className="text-xs text-destructive">
+              {errors.ensName}
+            </p>
+          )}
+        </div>
+
+        <Field
+          name="alias"
+          label="Apelido da carteira"
+          required
+          defaultValue={profile.alias}
+          error={errors.alias}
+        />
+        <AvatarField userId={userId} avatarUrl={profile.avatarUrl} />
+
+        {/* `div` em vez de `fieldset`: o fieldset ignora a largura da coluna e estoura no mobile. */}
+        <div role="group" aria-labelledby={passwordGroupId} className="grid gap-6 md:col-start-1">
+          <h2 id={passwordGroupId} className="font-bold">
+            Alterar senha
+          </h2>
+          <Field
+            name="currentPassword"
+            type="password"
+            label="Senha atual"
+            autoComplete="current-password"
+            error={errors.currentPassword}
+          />
+          <Field
+            name="newPassword"
+            type="password"
+            label="Nova senha"
+            autoComplete="new-password"
+            error={errors.newPassword}
+          />
+          <Field
+            name="confirmPassword"
+            type="password"
+            label="Confirmar nova senha"
+            autoComplete="new-password"
+            error={errors.confirmPassword}
+          />
+        </div>
+      </div>
+
+      <Button type="submit" aria-busy={pending} disabled={pending} className="h-10 w-fit px-7">
+        Salvar
+      </Button>
+    </form>
+  )
+}

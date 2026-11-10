@@ -1,10 +1,10 @@
-import { PageContainer } from '@/shared/components/PageContainer'
+import { ProfileShell } from '../../components/ProfileShell'
 
-// Provisória (task 26): o conteúdo vem na task da tela.
+// Provisória (task 26): o conteúdo vem na task de Carteiras (38). Já usa a moldura do Perfil.
 export function WalletsPage() {
   return (
-    <PageContainer className="py-10">
-      <h1 className="text-2xl font-bold">Carteiras</h1>
-    </PageContainer>
+    <ProfileShell>
+      <h1 className="font-bold">Carteiras</h1>
+    </ProfileShell>
   )
 }

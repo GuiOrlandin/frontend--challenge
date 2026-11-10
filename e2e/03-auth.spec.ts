@@ -2,10 +2,6 @@ import { expect, SESSION_KEY, test, USERS } from './fixtures'
 
 const PASSWORD = 'Kurio@123'
 
-/** Header só existe de `md` para cima; no mobile o "Sair" vem com o `ProfileNav` (task 37). */
-const headerOnly = (isMobile: boolean) =>
-  test.skip(isMobile, 'Menu da conta fica no header, que não aparece no mobile')
-
 test('login pela UI mostra erro de credencial e depois entra', async ({ page, isMobile }) => {
   await page.goto('/?auth=entrar')
   const dialog = page.getByRole('dialog', { name: 'Entrar' })
@@ -73,25 +69,43 @@ test('session-expired ao navegar para uma página privada pede login e volta par
   await dialog.getByLabel('Senha', { exact: true }).fill(PASSWORD)
   await dialog.getByRole('button', { name: 'Entrar', exact: true }).click()
   await expect(page).toHaveURL(/\/perfil$/)
-  await expect(page.getByRole('heading', { name: 'Perfil', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
 })
 
 test('logout volta para o início como Visitante', async ({ page, loginAs, isMobile }) => {
-  headerOnly(isMobile)
   await loginAs('ana')
-  await page.getByRole('button', { name: 'Conta de Ana Ribeiro' }).click()
-  await page.getByRole('menuitem', { name: 'Sair' }).click()
+  if (isMobile) {
+    // Sem header no mobile: o "Sair" fica no menu do perfil.
+    await page.getByRole('link', { name: 'Perfil' }).click()
+    await page
+      .getByRole('navigation', { name: 'Meu perfil' })
+      .getByRole('button', { name: 'Sair' })
+      .click()
+  } else {
+    await page.getByRole('button', { name: 'Conta de Ana Ribeiro' }).click()
+    await page.getByRole('menuitem', { name: 'Sair' }).click()
+    await expect(page.getByRole('link', { name: 'Entrar' })).toBeVisible()
+  }
 
-  await expect(page.getByRole('link', { name: 'Entrar' })).toBeVisible()
   await expect(page).toHaveURL(/\/$/)
-  expect(await page.evaluate((key) => localStorage.getItem(key), SESSION_KEY)).toBeNull()
+  await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), SESSION_KEY)).toBeNull()
 })
 
 test('troca de usuário sai e entra com outra conta', async ({ page, loginAs, isMobile }) => {
-  headerOnly(isMobile)
   await loginAs('ana')
-  await page.getByRole('button', { name: 'Conta de Ana Ribeiro' }).click()
-  await page.getByRole('menuitem', { name: 'Trocar de usuário' }).click()
+  if (isMobile) {
+    // Troca no mobile = Sair no menu do perfil e entrar de novo pelo Perfil da barra inferior.
+    await page.getByRole('link', { name: 'Perfil' }).click()
+    await page
+      .getByRole('navigation', { name: 'Meu perfil' })
+      .getByRole('button', { name: 'Sair' })
+      .click()
+    await expect(page).toHaveURL(/\/$/)
+    await page.getByRole('link', { name: 'Perfil' }).click()
+  } else {
+    await page.getByRole('button', { name: 'Conta de Ana Ribeiro' }).click()
+    await page.getByRole('menuitem', { name: 'Trocar de usuário' }).click()
+  }
 
   const dialog = page.getByRole('dialog', { name: 'Entrar' })
   await dialog.getByLabel('E-mail').fill(USERS.bruno)
@@ -99,5 +113,6 @@ test('troca de usuário sai e entra com outra conta', async ({ page, loginAs, is
   await dialog.getByRole('button', { name: 'Entrar', exact: true }).click()
 
   await expect(dialog).toBeHidden()
-  await expect(page.getByRole('button', { name: 'Conta de Bruno Tavares' })).toBeVisible()
+  if (isMobile) await expect(page.getByLabel('Nome de exibição')).toHaveValue('Bruno Tavares')
+  else await expect(page.getByRole('button', { name: 'Conta de Bruno Tavares' })).toBeVisible()
 })
