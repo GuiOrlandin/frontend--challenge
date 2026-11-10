@@ -26,10 +26,13 @@ export const NOW = new Date('2026-07-29T12:00:00Z')
 /** `window.__mock` só aparece depois que o worker do MSW já intercepta. */
 const mockReady = (page: Page) => page.waitForFunction(() => window.__mock !== undefined)
 
-export const test = base.extend<{
+export type Fixtures = {
   mock: Mock
   loginAs: (user: keyof typeof USERS) => Promise<void>
-}>({
+  addToCart: (item: { nftId: string; editionId: string; quantity?: number }) => Promise<void>
+}
+
+export const test = base.extend<Fixtures>({
   page: async ({ page }, use) => {
     await page.clock.install({ time: NOW })
     await use(page)
@@ -76,6 +79,27 @@ export const test = base.extend<{
       await page.reload()
       // Sem isso, uma chamada logo depois do reload pode sair antes de o worker voltar a interceptar.
       await mockReady(page)
+    })
+  },
+
+  /** Adiciona pela API simulada, com a sessão gravada (chame depois de `loginAs`); a UI só vê depois de navegar. */
+  addToCart: async ({ page }, use) => {
+    await use(async ({ quantity = 1, ...item }) => {
+      await mockReady(page)
+      await page.evaluate(
+        async ({ body, key }) => {
+          const res = await fetch('/api/cart/items', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem(key)}`,
+            },
+            body: JSON.stringify(body),
+          })
+          if (!res.ok) throw new Error(`addToCart falhou: ${res.status}`)
+        },
+        { body: { ...item, quantity }, key: SESSION_KEY },
+      )
     })
   },
 })

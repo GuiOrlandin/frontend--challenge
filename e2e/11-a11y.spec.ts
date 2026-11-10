@@ -2,34 +2,7 @@ import AxeBuilder from '@axe-core/playwright'
 import type { Page } from '@playwright/test'
 
 import { expect, test } from './fixtures'
-
-/** As 6 telas principais (SPEC §14.1), com o elemento que confirma que cada uma carregou. */
-const SCREENS = [
-  { name: 'Início', path: '/', ready: { role: 'list', name: 'NFTs' } },
-  { name: 'Detalhe', path: '/nft/nft_001', ready: { role: 'button', name: 'Favoritar' } },
-  { name: 'Carrinho', path: '/carrinho', ready: { role: 'heading', name: 'Carrinho de NFTs' } },
-  { name: 'Pagamento', path: '/pagamento', ready: { role: 'button', name: 'Continuar' } },
-  { name: 'Perfil', path: '/perfil', ready: { role: 'heading', name: 'Perfil do colecionador' } },
-  { name: 'Carteiras', path: '/perfil/carteiras', ready: { role: 'heading', name: 'Carteiras' } },
-] as const
-
-/** Logado com o nft_001 no carrinho: assim Carrinho e Pagamento têm conteúdo. */
-async function prepare(page: Page, loginAs: (user: 'ana') => Promise<void>) {
-  await loginAs('ana')
-  await page.goto('/nft/nft_001')
-  await page.getByRole('button', { name: 'Comprar' }).click()
-  await expect(page).toHaveURL(/\/carrinho$/)
-}
-
-async function open(page: Page, screen: (typeof SCREENS)[number]) {
-  await page.goto(screen.path)
-  await expect(
-    page
-      .getByRole(screen.ready.role, { name: screen.ready.name, exact: true })
-      .filter({ visible: true })
-      .first(),
-  ).toBeVisible()
-}
+import { open, prepare, SCREENS } from './screens'
 
 const horizontalOverflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
@@ -37,9 +10,10 @@ const horizontalOverflow = (page: Page) =>
 test('axe sem violações serious/critical e sem overflow horizontal nas 6 telas', async ({
   page,
   loginAs,
+  addToCart,
 }) => {
   test.setTimeout(90_000)
-  await prepare(page, loginAs)
+  await prepare({ loginAs, addToCart })
   for (const screen of SCREENS) {
     await open(page, screen)
     const { violations } = await new AxeBuilder({ page }).analyze()
@@ -53,11 +27,16 @@ test('axe sem violações serious/critical e sem overflow horizontal nas 6 telas
 
 // 720 = 1440 com zoom de 200% (SPEC §13.5); 768 = tablet (SPEC §14.1).
 for (const width of [720, 768]) {
-  test(`sem overflow horizontal a ${width} px nas 6 telas`, async ({ page, loginAs, isMobile }) => {
+  test(`sem overflow horizontal a ${width} px nas 6 telas`, async ({
+    page,
+    loginAs,
+    addToCart,
+    isMobile,
+  }) => {
     test.skip(isMobile, 'checagem única por largura, fora dos dois projetos')
     test.setTimeout(60_000)
     await page.setViewportSize({ width, height: 1024 })
-    await prepare(page, loginAs)
+    await prepare({ loginAs, addToCart })
     for (const screen of SCREENS) {
       await open(page, screen)
       expect(await horizontalOverflow(page), screen.name).toBe(0)
@@ -65,8 +44,8 @@ for (const width of [720, 768]) {
   })
 }
 
-test('cada rota tem título e descrição próprios', async ({ page, loginAs }) => {
-  await prepare(page, loginAs)
+test('cada rota tem título e descrição próprios', async ({ page, loginAs, addToCart }) => {
+  await prepare({ loginAs, addToCart })
   const titles = new Set<string>()
   for (const screen of SCREENS) {
     await open(page, screen)

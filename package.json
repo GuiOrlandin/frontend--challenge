@@ -18,8 +18,8 @@
     "format:check": "pnpm prettier --check",
     "test:unit": "vitest run --passWithNoTests",
     "test:e2e": "playwright test --grep-invert @visual",
-    "test:visual": "docker run --rm --ipc=host -v .:/work -v /work/node_modules -w /work mcr.microsoft.com/playwright:v1.65.0-noble sh -c \"npm i -g pnpm@12.18.0 && pnpm install --frozen-lockfile && pnpm exec playwright test --grep @visual --pass-with-no-tests\"",
-    "test:visual:update": "docker run --rm --ipc=host -v .:/work -v /work/node_modules -w /work mcr.microsoft.com/playwright:v1.65.0-noble sh -c \"npm i -g pnpm@12.18.0 && pnpm install --frozen-lockfile && pnpm exec playwright test --grep @visual --pass-with-no-tests --update-snapshots\"",
+    "test:visual": "docker run --rm --ipc=host -v .:/work -v /work/node_modules -w /work mcr.microsoft.com/playwright:v1.65.0-noble sh -c \"npm i -g pnpm@12.18.0 && pnpm install --frozen-lockfile && pnpm exec playwright test --grep @visual\"",
+    "test:visual:update": "docker run --rm --ipc=host -v .:/work -v /work/node_modules -w /work mcr.microsoft.com/playwright:v1.65.0-noble sh -c \"npm i -g pnpm@12.18.0 && pnpm install --frozen-lockfile && pnpm exec playwright test --grep @visual --update-snapshots\"",
     "images": "node scripts/optimize-images.mjs",
     "prettier": "prettier \"src/**/*.{ts,tsx,css}\" vite.config.ts playwright.config.ts \"e2e/**/*.ts\" eslint.config.js index.html \"tsconfig*.json\" package.json .prettierrc.json"
   },
