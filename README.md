@@ -129,6 +129,14 @@ Para os fluxos de compra: entre como Ana, adicione um NFT ao carrinho e siga at�
 - **Queda do socket com pedido pendente**: em `payment-refused` ou `default`, confirme a compra e rode `__mock.dropSocket()` ou recarregue a página. O pedido é retomado pelo id, sem nova compra.
 - **Eventos duplicados ou antigos**: com um NFT aberto, emita o mesmo evento duas vezes ou um com versão menor via `__mock.emit(...)`. A tela não regride nem repete o anúncio.
 
+## Decisões de interpretação
+
+### Estado "Aguardando confirmação" antes do comprovante
+
+O Figma vai direto da revisão do pagamento ao comprovante, mas o enunciado pede para "representar pedido pendente, confirmado e recusado" e "exibir a confirmação somente para pedido efetivamente confirmado". Entendi que o comprovante (frame "Confirmação de pedido") não pode aparecer enquanto o pedido está pendente; por isso, adicionei o estado pendente, que não tem frame.
+
+Não é um passo a mais no fluxo: é a mesma rota `/pedidos/$orderId`. Enquanto o pedido está `pending`, ela mostra "Aguardando confirmação da rede…" com o skeleton do comprovante. Quando o evento `order.updated` chega (~3 s no mock), troca para o comprovante, se confirmado, ou para o motivo da recusa com "Voltar ao pagamento". O mesmo estado sustenta a retomada após refresh ou queda do socket.
+
 ## Testes
 
 ```bash
