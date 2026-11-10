@@ -6,6 +6,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { createQueryClient } from './queryClient'
+import { RealtimeProvider } from './realtime/RealtimeProvider'
 import { createAppRouter } from './router'
 
 /** Liga o MSW antes de montar o app, só com `VITE_API_MOCKING=enabled` (SPEC §3.5). */
@@ -26,7 +27,9 @@ const router = createAppRouter(queryClient)
 createRoot(root).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <RealtimeProvider>
+        <RouterProvider router={router} />
+      </RealtimeProvider>
     </QueryClientProvider>
   </StrictMode>,
 )
