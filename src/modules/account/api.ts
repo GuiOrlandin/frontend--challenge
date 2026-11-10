@@ -1,4 +1,10 @@
-import type { ChangePasswordInput, Profile, ProfileInput } from '@/shared/contracts'
+import type {
+  ChangePasswordInput,
+  Profile,
+  ProfileInput,
+  Wallet,
+  WalletInput,
+} from '@/shared/contracts'
 import { http } from '@/shared/lib/http'
 
 export async function getProfile(signal?: AbortSignal): Promise<Profile> {
@@ -25,4 +31,19 @@ export async function removeAvatar(): Promise<Profile> {
 
 export async function changePassword(input: ChangePasswordInput): Promise<void> {
   await http.put('/me/password', input)
+}
+
+export async function getWallets(signal?: AbortSignal): Promise<Wallet[]> {
+  const { data } = await http.get<Wallet[]>('/me/wallets', { signal })
+  return data
+}
+
+export async function createWallet(input: WalletInput): Promise<Wallet> {
+  const { data } = await http.post<Wallet>('/me/wallets', input)
+  return data
+}
+
+export async function updateWallet(id: string, input: WalletInput): Promise<Wallet> {
+  const { data } = await http.patch<Wallet>(`/me/wallets/${id}`, input)
+  return data
 }

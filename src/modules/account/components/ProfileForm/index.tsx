@@ -3,19 +3,17 @@ import { type FormEvent, useId, useState } from 'react'
 import { toast } from 'sonner'
 
 import { changePasswordSchema, isApiError, profileSchema } from '@/shared/contracts'
+import { withEnsSuffix } from '@/shared/lib/ens'
 import { type FieldErrors, fieldErrorsOf, focusFirstInvalid } from '@/shared/lib/form'
 import { Button } from '@/shared/ui/button'
-import { Input } from '@/shared/ui/input'
-import { Label } from '@/shared/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 
 import { changePassword, updateProfile } from '../../api'
 import { saveProfile } from '../../queries'
 import { AvatarField } from '../AvatarField'
-import { Field, inputClass } from '../Field'
+import { EnsField } from '../EnsField'
+import { Field } from '../Field'
 import type { ProfileFormProps } from './types'
 
-const ENS_SUFFIX = '.eth'
 const PASSWORD_KEYS = ['currentPassword', 'newPassword', 'confirmPassword'] as const
 
 /**
@@ -24,7 +22,6 @@ const PASSWORD_KEYS = ['currentPassword', 'newPassword', 'confirmPassword'] as c
  */
 export function ProfileForm({ userId, profile }: ProfileFormProps) {
   const queryClient = useQueryClient()
-  const ensId = useId()
   const passwordGroupId = useId()
   const [errors, setErrors] = useState<FieldErrors>({})
   const [pending, setPending] = useState(false)
@@ -38,12 +35,7 @@ export function ProfileForm({ userId, profile }: ProfileFormProps) {
     }
 
     const data = Object.fromEntries(new FormData(form)) as Record<string, string>
-    // O sufixo vem do select; um ".eth" digitado não vira ".eth.eth".
-    const ensLabel = (data.ensName ?? '').trim().replace(/\.eth$/, '')
-    const profileResult = profileSchema.safeParse({
-      ...data,
-      ensName: ensLabel && `${ensLabel}${ENS_SUFFIX}`,
-    })
+    const profileResult = profileSchema.safeParse({ ...data, ensName: withEnsSuffix(data.ensName) })
     const wantsPassword = PASSWORD_KEYS.some((key) => data[key])
     const passwordResult = wantsPassword ? changePasswordSchema.safeParse(data) : undefined
     const clientErrors = {
@@ -114,39 +106,7 @@ export function ProfileForm({ userId, profile }: ProfileFormProps) {
           error={errors.email}
         />
 
-        <div className="grid content-start gap-3">
-          <Label htmlFor={ensId} className="font-normal">
-            Nome ENS
-            <span aria-hidden="true" className="-ml-1.5 text-base leading-none text-primary">
-              *
-            </span>
-          </Label>
-          <div className="flex gap-2">
-            {/* Só `.eth` (SPEC §9): o select existe porque está no Figma. */}
-            <Select value={ENS_SUFFIX}>
-              <SelectTrigger aria-label="Domínio ENS" className="h-10! dark:bg-transparent">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ENS_SUFFIX}>{ENS_SUFFIX}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input
-              id={ensId}
-              name="ensName"
-              aria-required
-              aria-invalid={errors.ensName ? true : undefined}
-              aria-describedby={errors.ensName ? `${ensId}-erro` : undefined}
-              defaultValue={profile.ensName.slice(0, -ENS_SUFFIX.length)}
-              className={inputClass}
-            />
-          </div>
-          {errors.ensName && (
-            <p id={`${ensId}-erro`} className="text-xs text-destructive">
-              {errors.ensName}
-            </p>
-          )}
-        </div>
+        <EnsField defaultValue={profile.ensName} error={errors.ensName} />
 
         <Field
           name="alias"

@@ -111,3 +111,80 @@ test('senha trocada com conflito no perfil esvazia os campos de senha e avisa', 
   ).toBeVisible()
   await expect(page.getByLabel('Senha atual')).toHaveValue('')
 })
+
+test.describe('carteiras', () => {
+  test.beforeEach(async ({ page }) => {
+    await page
+      .getByRole('navigation', { name: 'Meu perfil' })
+      .getByRole('link', { name: 'Carteiras' })
+      .click()
+    await expect(page.getByRole('heading', { name: 'Carteiras', level: 1 })).toBeVisible()
+  })
+
+  test('edita a carteira principal e persiste após o refresh', async ({ page }) => {
+    const primary = page.getByRole('region', { name: 'Carteira principal' })
+    await primary.getByLabel('Apelido da carteira').fill('Cofre')
+    await primary.getByRole('button', { name: 'Salvar' }).click()
+    await expect(page.getByText('Carteira salva')).toBeVisible()
+
+    await page.reload()
+    await expect(
+      page.getByRole('region', { name: 'Carteira principal' }).getByLabel('Apelido da carteira'),
+    ).toHaveValue('Cofre')
+  })
+
+  test('valida o endereço pela rede', async ({ page }) => {
+    const primary = page.getByRole('region', { name: 'Carteira principal' })
+    await primary.getByLabel('Rede').click()
+    await page.getByRole('option', { name: 'Solana' }).click()
+    await primary.getByRole('button', { name: 'Salvar' }).click()
+    const address = primary.getByLabel('Endereço da carteira')
+    await expect(address).toHaveAccessibleDescription(
+      'Use um endereço Solana (base58, 32 a 44 caracteres)',
+    )
+    await expect(address).toBeFocused()
+  })
+
+  test('adiciona a secundária pelo atalho, sem repetir apelido e endereço, e volta ao pagamento', async ({
+    page,
+    loginAs,
+  }) => {
+    // Bruno só tem a principal (Solana): a secundária começa com "Adicionar".
+    await loginAs('bruno')
+    await page.goto('/perfil/carteiras?redirect=/pagamento')
+    const secondary = page.getByRole('region', { name: 'Carteira secundária' })
+    await secondary.getByRole('button', { name: 'Adicionar' }).click()
+
+    // Rede vazia: o foco do erro vai para o select.
+    await secondary.getByLabel('Apelido da carteira').fill('Solana')
+    await secondary.getByRole('button', { name: 'Salvar' }).click()
+    await expect(secondary.getByLabel('Rede')).toHaveAccessibleDescription('Selecione a rede')
+    await expect(secondary.getByLabel('Rede')).toBeFocused()
+
+    await secondary
+      .getByLabel('Endereço da carteira')
+      .fill('7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU')
+    await secondary.getByRole('button', { name: 'Igual à carteira principal' }).click()
+    await expect(secondary.getByLabel('Rede')).toHaveText('Solana')
+    await expect(secondary.getByLabel('Código de indicação')).toHaveValue('BRUNO42')
+    await secondary.getByRole('button', { name: 'Salvar' }).click()
+    await expect(secondary.getByLabel('Apelido da carteira')).toHaveAccessibleDescription(
+      'Use um apelido diferente da carteira principal',
+    )
+    await expect(secondary.getByLabel('Endereço da carteira')).toHaveAccessibleDescription(
+      'Use um endereço diferente da carteira principal',
+    )
+
+    await secondary.getByLabel('Apelido da carteira').fill('Reserva')
+    await secondary
+      .getByLabel('Endereço da carteira')
+      .fill('9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM')
+    await secondary.getByRole('button', { name: 'Salvar' }).click()
+    await expect(page).toHaveURL((url) => url.pathname === '/pagamento')
+
+    await page.goto('/perfil/carteiras')
+    await expect(
+      page.getByRole('region', { name: 'Carteira secundária' }).getByLabel('Apelido da carteira'),
+    ).toHaveValue('Reserva')
+  })
+})
