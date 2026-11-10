@@ -2,6 +2,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 
 import { routeTree } from '@/routeTree.gen'
+import { PageSkeleton } from '@/shared/components/PageSkeleton'
 
 import { NotFoundPage } from './layout/NotFoundPage'
 import { RootLayout } from './layout/RootLayout'
@@ -16,6 +17,8 @@ export function createAppRouter(queryClient: QueryClient) {
     defaultPreloadStaleTime: 0,
     defaultPendingMs: 0,
     defaultPendingMinMs: 0,
+    // Cada tela troca pelo skeleton dela (`pendingComponent` na rota) na task da tela.
+    defaultPendingComponent: PageSkeleton,
     defaultNotFoundComponent: NotFoundPage,
     defaultErrorComponent: RouteError,
     // Fica por fora das rotas: o layout aparece também no 404, no erro e durante o boot.

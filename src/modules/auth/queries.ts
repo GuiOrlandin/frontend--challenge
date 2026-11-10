@@ -7,7 +7,9 @@ export const sessionQueries = {
   current: () =>
     queryOptions({
       queryKey: ['session'],
-      queryFn: ({ signal }) => getSession(signal),
+      // Sem `signal`: o boot (`beforeLoad`) espera esta busca, e um observer que desmonta
+      // (ex.: o header no StrictMode) a cancelaria, derrubando a rota raiz com CancelledError.
+      queryFn: () => getSession(),
       staleTime: Infinity,
     }),
 }

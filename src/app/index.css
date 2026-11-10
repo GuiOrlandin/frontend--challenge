@@ -79,6 +79,10 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* Foco visível em tudo que não tem anel próprio (SPEC §13.5); o `outline-none` dos componentes vence. */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
   body {
     @apply bg-background font-mono text-foreground antialiased;
   }

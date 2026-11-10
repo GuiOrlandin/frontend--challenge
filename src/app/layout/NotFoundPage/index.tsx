@@ -9,7 +9,7 @@ export function NotFoundPage() {
     <PageContainer className="py-10">
       <h1 className="sr-only">Página não encontrada</h1>
       <EmptyState
-        title="Página não encontrada"
+        title="Erro 404"
         description="O endereço não existe ou foi removido."
         action={
           <Button asChild>
