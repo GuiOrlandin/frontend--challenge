@@ -74,6 +74,8 @@ export const test = base.extend<{
         { email: USERS[user], password: PASSWORD, key: SESSION_KEY },
       )
       await page.reload()
+      // Sem isso, uma chamada logo depois do reload pode sair antes de o worker voltar a interceptar.
+      await mockReady(page)
     })
   },
 })

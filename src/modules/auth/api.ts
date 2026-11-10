@@ -1,4 +1,4 @@
-import type { Session } from '@/shared/contracts'
+import type { AuthResponse, LoginInput, RegisterInput, Session } from '@/shared/contracts'
 import { isApiError } from '@/shared/contracts'
 import { http } from '@/shared/lib/http'
 import { tokenStore } from '@/shared/lib/tokenStore'
@@ -14,4 +14,19 @@ export async function getSession(): Promise<Session | null> {
     tokenStore.clearSessionToken()
     return null
   }
+}
+
+export async function login(input: LoginInput): Promise<AuthResponse> {
+  const { data } = await http.post<AuthResponse>('/auth/login', input)
+  return data
+}
+
+/** A API valida o mesmo `registerSchema`, inclusive a confirmação. */
+export async function register(input: RegisterInput): Promise<AuthResponse> {
+  const { data } = await http.post<AuthResponse>('/auth/register', input)
+  return data
+}
+
+export async function logout(): Promise<void> {
+  await http.post('/auth/logout')
 }

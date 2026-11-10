@@ -1,11 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 
 import CartIcon from '@/assets/icons/cart.svg?react'
-import LogInIcon from '@/assets/icons/log-in.svg?react'
-import { sessionQueries } from '@/modules/auth'
-import { Button } from '@/shared/ui/button'
-import { Skeleton } from '@/shared/ui/skeleton'
+import { AccountMenu, AuthDialog, useSessionSync } from '@/modules/auth'
 import { Toaster } from '@/shared/ui/sonner'
 
 import { Footer } from '../Footer'
@@ -21,34 +17,12 @@ function CartSlot() {
   )
 }
 
-/** "Entrar" para Visitante; menu do Colecionador provisório até a task de auth (29). */
-function AccountSlot() {
-  const session = useQuery(sessionQueries.current())
-
-  // Skeleton no boot, sem flash de "Entrar" (SPEC §6).
-  if (session.isPending) return <Skeleton className="h-8 w-20" />
-  if (session.data) {
-    return (
-      <Button asChild size="sm" variant="outline">
-        <Link to="/perfil">{session.data.user.displayName}</Link>
-      </Button>
-    )
-  }
-  return (
-    <Button asChild size="sm">
-      <Link to="." search={(prev) => ({ ...prev, auth: 'entrar' as const })}>
-        <LogInIcon className="size-4" />
-        Entrar
-      </Link>
-    </Button>
-  )
-}
-
 /**
  * Moldura de todas as rotas (entra como `InnerWrap` do router, então o 404 também tem layout).
  * O Toaster é a região `aria-live` global (SPEC §13.5).
  */
 export function RootLayout({ children }: { children: React.ReactNode }) {
+  useSessionSync()
   return (
     <div className="flex min-h-dvh flex-col">
       <a
@@ -57,12 +31,13 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
       >
         Pular para o conteúdo
       </a>
-      <Header cart={<CartSlot />} account={<AccountSlot />} />
+      <Header cart={<CartSlot />} account={<AccountMenu />} />
       <main id="conteudo" tabIndex={-1} className="flex-1 outline-none">
         {children}
       </main>
       <Footer />
       <MobileBottomNav />
+      <AuthDialog />
       <Toaster />
     </div>
   )
