@@ -100,7 +100,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['*.{js,ts}'],
+    files: ['*.{js,ts}', 'e2e/**/*.ts'],
     extends: [js.configs.recommended, tseslint.configs.recommended],
     languageOptions: { globals: globals.node },
   },
