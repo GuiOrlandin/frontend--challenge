@@ -38,3 +38,11 @@ export function writeDraft(draft: CheckoutDraft) {
     // Storage cheio ou bloqueado: o formulário segue funcionando sem rascunho.
   }
 }
+
+export function clearDraft() {
+  try {
+    sessionStorage.removeItem(DRAFT_KEY)
+  } catch {
+    // Storage bloqueado: nada a apagar.
+  }
+}

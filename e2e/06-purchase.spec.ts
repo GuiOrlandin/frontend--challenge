@@ -79,3 +79,43 @@ test.describe('pagamento: dados do comprador', () => {
     await expect(page.getByText('Seu carrinho está vazio.', { exact: true })).toBeVisible()
   })
 })
+
+test.describe('pagamento: pedido e recibo', () => {
+  test('do catálogo ao recibo confirmado, com o carrinho baixado', async ({ page, loginAs }) => {
+    await loginAs('ana')
+    await goToCheckout(page)
+    await page.getByRole('button', { name: 'Continuar' }).click()
+    await page.getByRole('button', { name: 'Confirmar compra' }).click()
+
+    await expect(page).toHaveURL(/\/pedidos\/ord_\d+$/)
+    await expect(page.getByText('Aguardando confirmação da rede…')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'Seus NFTs agora estão na sua carteira' }),
+    ).toBeVisible()
+    await expect(
+      page.getByRole('list', { name: 'NFTs comprados' }).getByRole('listitem'),
+    ).toHaveCount(1)
+
+    await expect(page.getByText('Transação simulada, sem registro em blockchain')).toBeHidden()
+    await page.getByRole('button', { name: 'Ver no Etherscan' }).click()
+    await expect(page.getByText(/^0x[0-9a-f]{64}$/i)).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Copiar hash' })).toBeVisible()
+    await expect(page.getByText('Transação simulada, sem registro em blockchain')).toBeVisible()
+
+    await page.goto('/carrinho')
+    await expect(page.getByText('Seu carrinho está vazio', { exact: true })).toBeVisible()
+  })
+
+  test('pedido de outro Colecionador é 404', async ({ page, loginAs }) => {
+    await loginAs('ana')
+    await goToCheckout(page)
+    await page.getByRole('button', { name: 'Continuar' }).click()
+    await page.getByRole('button', { name: 'Confirmar compra' }).click()
+    await expect(page).toHaveURL(/\/pedidos\/ord_\d+$/)
+    const orderUrl = new URL(page.url()).pathname
+
+    await loginAs('bruno')
+    await page.goto(orderUrl)
+    await expect(page.getByText('Erro 404')).toBeVisible()
+  })
+})

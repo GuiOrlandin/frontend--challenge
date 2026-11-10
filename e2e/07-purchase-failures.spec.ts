@@ -91,3 +91,21 @@ test('refresh antes do pedido retoma a tentativa com a mesma chave', async ({ pa
   await expect(page).toHaveURL(/\/pedidos\/ord_\d+$/, { timeout: 30_000 })
   expect(new Set(keys).size).toBe(1)
 })
+
+test('payment-refused mostra o motivo e volta ao pagamento com o carrinho intacto', async ({
+  page,
+  loginAs,
+}) => {
+  await goToReview(page, loginAs, 'payment-refused')
+
+  await confirmButton(page).click()
+  await expect(page).toHaveURL(/\/pedidos\/ord_\d+$/)
+  await expect(page.getByRole('heading', { name: 'Pedido recusado' })).toBeVisible()
+  await expect(page.getByText(/O pagamento foi recusado pela carteira\./)).toBeVisible()
+  await expect(page.getByText('Seus NFTs agora estão na sua carteira')).toBeHidden()
+
+  await page.getByRole('link', { name: 'Voltar ao pagamento' }).click()
+  // Com o carrinho vazio o loader voltaria ao `/carrinho`.
+  await expect(page).toHaveURL(/\/pagamento/)
+  await expect(page.getByRole('button', { name: 'Continuar' })).toBeVisible()
+})

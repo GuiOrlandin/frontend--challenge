@@ -35,3 +35,9 @@ export async function createOrder(input: OrderInput, key: string): Promise<Order
   })
   return data
 }
+
+/** 404 `NOT_FOUND` também para pedido de outro Colecionador (SPEC §8.5). */
+export async function getOrder(id: string, signal?: AbortSignal): Promise<Order> {
+  const { data } = await http.get<Order>(`/orders/${id}`, { signal })
+  return data
+}

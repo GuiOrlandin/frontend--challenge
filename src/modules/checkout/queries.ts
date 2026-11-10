@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import type { Network, WalletProvider } from '@/shared/contracts'
 
-import { connectWallet, createQuote } from './api'
+import { connectWallet, createQuote, getOrder } from './api'
 
 /**
  * Cotação e Conexão da revisão (SPEC §8.1). São `POST` com efeito: sem retry, sem refetch no
@@ -25,5 +25,12 @@ export const checkoutQueries = {
       staleTime: Infinity,
       gcTime: 0,
       retry: false,
+    }),
+  /** Sempre stale (SPEC §11.2); o polling de 5 s fica no `OrderPage`, que sabe do socket. */
+  order: (userId: string, orderId: string) =>
+    queryOptions({
+      queryKey: ['order', userId, orderId],
+      queryFn: ({ signal }) => getOrder(orderId, signal),
+      staleTime: 0,
     }),
 }
