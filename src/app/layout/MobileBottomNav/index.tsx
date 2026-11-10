@@ -40,10 +40,11 @@ export function MobileBottomNav() {
           </button>
         </li>
         <li>
-          {/* shortcut: leva ao catálogo; abrir o Sheet de filtros entra na task do catálogo (30). */}
+          {/* A Início abre o Sheet de filtros pelo hash; na própria Início, mantém a busca atual. */}
           <Link
             to="/"
-            hash="catalogo"
+            search={pathname === '/' ? true : {}}
+            hash="filtros"
             aria-label="Filtros"
             className="-mt-10 flex size-14 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground"
           >

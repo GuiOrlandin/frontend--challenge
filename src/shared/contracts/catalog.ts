@@ -1,5 +1,7 @@
 /** Parâmetros do catálogo (`GET /api/nfts`, search params da `/`; SPEC §4.2 e §11.1). */
-import type { Eth, Network } from './entities'
+import { z } from 'zod'
+
+import { NETWORKS, type Eth, type Network } from './entities'
 
 export const CATALOG_TABS = ['all', 'new', 'trending'] as const
 export type CatalogTab = (typeof CATALOG_TABS)[number]
@@ -63,3 +65,34 @@ export function normalizeCatalogParams(params: CatalogParams): CatalogParams {
     Object.entries(normalized).filter(([, value]) => value !== undefined),
   ) as CatalogParams
 }
+
+// O router faz JSON.parse dos valores da URL: `?priceMin=1.5` chega como número.
+const decimal = z.coerce
+  .string()
+  .regex(/^\d+(\.\d+)?$/)
+  .optional()
+  .catch(undefined)
+
+/** Search params da `/` (SPEC §4.2). Valor inválido cai no padrão, campo a campo. */
+export const catalogSearchSchema = z.object({
+  q: z.coerce.string().default('').catch(''),
+  category: z.array(z.string()).default([]).catch([]),
+  network: z.array(z.enum(NETWORKS)).default([]).catch([]),
+  priceMin: decimal,
+  priceMax: decimal,
+  tab: z.enum(CATALOG_TABS).default('all').catch('all'),
+  sort: z.enum(CATALOG_SORTS).default('recent').catch('recent'),
+  page: z.number().int().min(1).default(1).catch(1),
+})
+
+export type CatalogSearch = z.infer<typeof catalogSearchSchema>
+
+/** Padrões removidos da URL pelo `stripSearchParams`. */
+export const CATALOG_SEARCH_DEFAULTS = {
+  q: '',
+  category: [],
+  network: [],
+  tab: 'all',
+  sort: 'recent',
+  page: 1,
+} satisfies Partial<CatalogSearch>

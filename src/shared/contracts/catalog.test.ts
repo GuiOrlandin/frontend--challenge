@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { normalizeCatalogParams } from './catalog'
+import { catalogSearchSchema, normalizeCatalogParams } from './catalog'
 
 describe('normalizeCatalogParams', () => {
   it('reduces the defaults to an empty object', () => {
@@ -69,5 +69,46 @@ describe('normalizeCatalogParams', () => {
     const category = ['b', 'a']
     normalizeCatalogParams({ category })
     expect(category).toEqual(['b', 'a'])
+  })
+})
+
+describe('catalogSearchSchema (SPEC §4.2)', () => {
+  it('fills the defaults for an empty URL', () => {
+    expect(catalogSearchSchema.parse({})).toEqual({
+      q: '',
+      category: [],
+      network: [],
+      tab: 'all',
+      sort: 'recent',
+      page: 1,
+    })
+  })
+
+  it('accepts prices parsed as numbers by the router and keeps them as decimal strings', () => {
+    expect(catalogSearchSchema.parse({ priceMin: 0.5, priceMax: '12.30' })).toMatchObject({
+      priceMin: '0.5',
+      priceMax: '12.30',
+    })
+  })
+
+  it('drops each invalid field on its own, keeping the valid ones', () => {
+    expect(
+      catalogSearchSchema.parse({
+        q: 'ape',
+        network: ['bitcoin'],
+        priceMin: '-1',
+        tab: 'hot',
+        sort: 'price_desc',
+        page: 0,
+      }),
+    ).toEqual({
+      q: 'ape',
+      category: [],
+      network: [],
+      priceMin: undefined,
+      tab: 'all',
+      sort: 'price_desc',
+      page: 1,
+    })
   })
 })

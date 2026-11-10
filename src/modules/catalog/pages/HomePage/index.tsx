@@ -1,10 +1,93 @@
-import { PageContainer } from '@/shared/components/PageContainer'
+import { useLocation, useNavigate } from '@tanstack/react-router'
+import { useCallback, useState } from 'react'
 
-// Provisória (task 26): o conteúdo vem na task da tela.
+import SlidersIcon from '@/assets/icons/sliders.svg?react'
+import { PageContainer } from '@/shared/components/PageContainer'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/shared/ui/sheet'
+
+import { CatalogGrid } from '../../components/CatalogGrid'
+import { CatalogSearch } from '../../components/CatalogSearch'
+import { CatalogTabs } from '../../components/CatalogTabs'
+import { FiltersPanel } from '../../components/FiltersPanel'
+import { SortSelect } from '../../components/SortSelect'
+import { useCatalogSearch } from '../../hooks/useCatalogSearch'
+
+/** Hash usado pela barra inferior para abrir o Sheet de filtros (SPEC §4.4). */
+const FILTERS_HASH = 'filtros'
+
 export function HomePage() {
+  const { search, update } = useCatalogSearch()
+  const { hash } = useLocation()
+  const navigate = useNavigate({ from: '/' })
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  // Abre só quando o hash *chega* (as navegações dos filtros o derrubam, então o estado fica
+  // local). No desktop os filtros já estão na barra lateral: o hash não abre o Sheet.
+  const [lastHash, setLastHash] = useState(hash)
+  if (hash !== lastHash) {
+    setLastHash(hash)
+    if (hash === FILTERS_HASH && !window.matchMedia('(min-width: 1024px)').matches) {
+      setFiltersOpen(true)
+    }
+  }
+
+  // Estável: o debounce da busca não recomeça a cada render da página.
+  const onSearch = useCallback((q: string) => void update({ q }, { replace: true }), [update])
+
+  function onFiltersOpenChange(open: boolean) {
+    setFiltersOpen(open)
+    if (!open && hash === FILTERS_HASH) {
+      void navigate({ search: (prev) => prev, hash: '', replace: true, resetScroll: false })
+    }
+  }
+
   return (
-    <PageContainer className="py-10">
-      <h1 className="text-2xl font-bold">Início</h1>
+    <PageContainer className="flex flex-col gap-6 py-4 lg:py-24">
+      {/* Abaixo de `lg`: busca e filtros no topo (frame mobile). No desktop, a busca é a do header. */}
+      <div className="flex items-center gap-3 lg:hidden">
+        <CatalogSearch q={search.q} onSearch={onSearch} />
+        <Sheet open={filtersOpen} onOpenChange={onFiltersOpenChange}>
+          <button
+            type="button"
+            aria-label="Abrir filtros"
+            onClick={() => onFiltersOpenChange(true)}
+            className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
+          >
+            <SlidersIcon className="size-5" />
+          </button>
+          <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto rounded-t-3xl">
+            <SheetHeader>
+              <SheetTitle>Filtros</SheetTitle>
+              <SheetDescription className="sr-only">
+                Os filtros se aplicam ao catálogo assim que são escolhidos.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="px-4 pb-8">
+              <FiltersPanel />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      <section
+        id="catalogo"
+        aria-labelledby="catalogo-titulo"
+        className="grid scroll-mt-4 gap-10 lg:grid-cols-[18rem_1fr]"
+      >
+        <h2 id="catalogo-titulo" className="sr-only">
+          Catálogo
+        </h2>
+        <aside aria-label="Filtros" className="hidden self-start rounded-lg bg-card p-6 lg:block">
+          <FiltersPanel />
+        </aside>
+
+        <div className="flex min-w-0 flex-col gap-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <CatalogTabs active={search.tab} />
+            <SortSelect value={search.sort} onChange={(sort) => void update({ sort })} />
+          </div>
+          <CatalogGrid search={search} />
+        </div>
+      </section>
     </PageContainer>
   )
 }
