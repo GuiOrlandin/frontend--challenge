@@ -20,8 +20,8 @@ test('altera a quantidade e remove a linha', async ({ page }) => {
   await buy(page)
   await line(page).getByRole('button', { name: 'Aumentar quantidade' }).click()
   await expect(line(page).getByRole('textbox', { name: `Quantidade de ${TITLE}` })).toHaveValue('2')
-  await expect(line(page)).toContainText('2,38 ETH')
-  await expect(page.getByRole('region', { name: 'Resumo da carteira' })).toContainText('2,38 ETH')
+  await expect(line(page)).toContainText('2.38 ETH')
+  await expect(page.getByRole('region', { name: 'Resumo da carteira' })).toContainText('2.38 ETH')
 
   await line(page)
     .getByRole('button', { name: `Remover ${TITLE}` })
@@ -46,8 +46,8 @@ test('cupons: KURIO10 aplica, EXPIRADO e inválido dão erro no campo', async ({
   await field.fill('KURIO10')
   await summary.getByRole('button', { name: 'Aplicar' }).click()
   await expect(summary.getByText('KURIO10')).toBeVisible()
-  // 10% de 1,19 ETH.
-  await expect(summary).toContainText('(-) 0,119 ETH')
+  // 10% de 1.19 ETH.
+  await expect(summary).toContainText('(-) 0.119 ETH')
 })
 
 test('o carrinho continua após recarregar', async ({ page }) => {
@@ -111,7 +111,7 @@ test('preço novo pelo tempo real é anunciado e destaca a linha', async ({ page
     await mock.updateNft('nft_001', { editions })
     await expect(announcement).toBeVisible({ timeout: 1_000 })
   }).toPass()
-  await expect(announcement).toHaveText(`${TITLE}: preço mudou de 1,19 para 2,50 ETH`)
-  await expect(line(page)).toContainText('2,50 ETH')
+  await expect(announcement).toHaveText(`${TITLE}: preço mudou de 1.19 para 2.50 ETH`)
+  await expect(line(page)).toContainText('2.50 ETH')
   await expect(line(page)).toHaveClass(/ring-primary/)
 })

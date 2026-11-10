@@ -36,10 +36,12 @@ export function WalletsPage() {
 
   return (
     <ProfileShell>
-      <div className="grid gap-10">
-        <h1 className="font-bold">Carteiras</h1>
+      <div className="grid gap-10 lg:gap-6">
+        {/* O frame abre direto em "Carteira principal"; o título da página fica para leitores de tela. */}
+        <h1 className="sr-only">Carteiras</h1>
         <WalletSection
           title="Carteira principal"
+          description="Estas carteiras ficam disponíveis no pagamento e para receber NFTs comprados."
           role="primary"
           userId={userId}
           wallet={primary}

@@ -12,7 +12,7 @@ import { useLogout } from '@/modules/auth'
 
 // Inativos em `option` (#CFB28C): o laranja a 75% do Figma não dá 4,5:1 sobre o `card`.
 const itemClass =
-  'flex shrink-0 items-center gap-3 whitespace-nowrap border-transparent px-4 py-3 text-sm max-lg:border-b-2 lg:border-l-2'
+  'flex shrink-0 items-center gap-3 whitespace-nowrap border-transparent px-4 py-3 text-sm lg:text-15 max-lg:border-b-2 lg:border-l-2'
 // O `Link` marca `data-status="active"`; o `activeProps` só concatenaria classes em conflito.
 const linkClass = `${itemClass} text-option hover:text-primary data-[status=active]:border-primary data-[status=active]:text-primary`
 
@@ -31,7 +31,7 @@ export function ProfileNav() {
 
   return (
     <nav aria-label="Meu perfil" className="bg-card lg:self-start">
-      <h2 className="hidden px-4 pt-5 pb-3 font-bold lg:block">Meu perfil</h2>
+      <h2 className="hidden px-4 pt-5 pb-3 text-lg font-bold lg:block">Meu perfil</h2>
       <ul className="flex overflow-x-auto lg:flex-col lg:overflow-visible">
         <li>
           <Link to="/perfil" activeOptions={{ exact: true }} className={linkClass}>

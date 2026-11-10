@@ -97,23 +97,26 @@ test('faixa de preço aplica os limites escolhidos', async ({ page, isMobile }) 
   await expect(grid(page)).toBeVisible()
   const panel = await openFilters(page, isMobile)
   await panel.getByRole('slider', { name: 'Preço máximo' }).focus()
-  // Do teto (12,30) para 1,00 ETH: 1.130 passos de 1 centavo, 10 por PageDown.
+  // Do teto (12.30) para 1.00 ETH: 1.130 passos de 1 centavo, 10 por PageDown.
   for (let i = 0; i < 113; i++) await page.keyboard.press('PageDown')
-  await expect(panel.getByText('Preço: 0,02 – 1,00 ETH')).toBeVisible()
+  await expect(panel.getByText('Preço: 0.02 – 1.00 ETH')).toBeVisible()
   await panel.getByRole('button', { name: 'Aplicar' }).click()
   await expect(page).toHaveURL(/priceMax=/)
   await closeFilters(page, isMobile)
   await expectGrid(page, 'priceMax=1.00')
 })
 
-test('ordena por menor preço', async ({ page }) => {
+test('ordena por menor preço', async ({ page, isMobile }) => {
   await page.goto('/')
   await expect(grid(page)).toBeVisible()
+  // No mobile a ordenação fica no Sheet de filtros.
+  if (isMobile) await openFilters(page, isMobile)
   await page.getByRole('combobox', { name: 'Ordenar por:' }).click()
   await page.getByRole('option', { name: 'Menor preço' }).click()
   await expect(page).toHaveURL(/sort=price_asc/)
+  await closeFilters(page, isMobile)
   await expectGrid(page, 'sort=price_asc')
-  await expect(grid(page).getByRole('listitem').first()).toContainText('0,02 ETH')
+  await expect(grid(page).getByRole('listitem').first()).toContainText('0.02 ETH')
 })
 
 test('abas trocam o recorte do catálogo', async ({ page }) => {

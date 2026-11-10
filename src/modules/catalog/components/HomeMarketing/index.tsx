@@ -29,20 +29,21 @@ export function PromoBanners() {
       {BANNERS.map((banner) => (
         <section
           key={banner.title}
-          className="grid grid-cols-[2fr_3fr] overflow-hidden rounded-2xl bg-card"
+          className="grid grid-cols-2 overflow-hidden rounded-2xl bg-card"
         >
+          {/* Arte em meio card, na altura toda (frame ~588×250, não quadrada). */}
           <img
             src={banner.image}
             alt=""
             width={640}
             height={640}
             loading="lazy"
-            className="size-full min-h-50 rounded-2xl object-cover"
+            className="size-full min-h-50 rounded-2xl object-cover lg:min-h-62"
           />
           <div className="flex flex-col items-end gap-3 p-4 text-right">
-            <h2 className="text-base font-bold">{banner.title}</h2>
-            <p className="text-xs leading-relaxed text-primary">{banner.text}</p>
-            <Button asChild size="sm" className="mt-auto">
+            <h2 className="text-base font-bold lg:text-lg">{banner.title}</h2>
+            <p className="text-xs leading-relaxed text-primary lg:text-sm">{banner.text}</p>
+            <Button asChild size="lg" className="mt-auto">
               <Link to="/" hash="catalogo">
                 Explorar <ArrowExploreIcon className="h-2.5 w-3" />
               </Link>
@@ -90,10 +91,10 @@ export function MintJournal() {
   return (
     <section aria-labelledby="diario-titulo" className="flex flex-col gap-8">
       <header className="flex flex-col gap-3 text-center">
-        <h2 id="diario-titulo" className="text-2xl font-bold">
+        <h2 id="diario-titulo" className="text-2xl font-bold lg:text-28">
           Diário da Cunhagem
         </h2>
-        <p className="text-xs text-option">
+        <p className="text-xs text-option lg:text-sm">
           Histórias, guias e insights para colecionadores sobre o universo da propriedade digital.
         </p>
       </header>
@@ -113,7 +114,7 @@ export function MintJournal() {
                 <p className="text-xs text-option">
                   {post.date} | Leitura de {post.read} min
                 </p>
-                <h3 className="text-sm font-bold">{post.title}</h3>
+                <h3 className="text-sm font-bold lg:text-base">{post.title}</h3>
                 <p className="text-xs text-option">{post.text}</p>
                 {/* Estático (SPEC §1): sem página do artigo. */}
                 <span className="mt-auto flex items-center gap-1 text-xs text-primary">

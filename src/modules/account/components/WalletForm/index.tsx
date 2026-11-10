@@ -87,13 +87,7 @@ export function WalletForm({ userId, role, wallet, defaults, primary, onSaved }:
       className="grid gap-6"
     >
       <div key={fillCount} className="grid gap-x-7 gap-y-6 md:grid-cols-2">
-        <Field
-          name="label"
-          label="Apelido da carteira"
-          required
-          defaultValue={values.label}
-          error={errors.label}
-        />
+        {/* Ordem do frame: Nome de exibição | Apelido da carteira. */}
         <Field
           name="displayName"
           label="Nome de exibição"
@@ -101,6 +95,13 @@ export function WalletForm({ userId, role, wallet, defaults, primary, onSaved }:
           autoComplete="name"
           defaultValue={values.displayName}
           error={errors.displayName}
+        />
+        <Field
+          name="label"
+          label="Apelido da carteira"
+          required
+          defaultValue={values.label}
+          error={errors.label}
         />
         <SelectField
           name="network"
@@ -160,14 +161,20 @@ export function WalletForm({ userId, role, wallet, defaults, primary, onSaved }:
         <EnsField defaultValue={values.ensName} error={errors.ensName} />
       </div>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Button type="submit" aria-busy={pending} disabled={pending} className="h-10 w-fit px-7">
-          Salvar
+          Salvar carteira
         </Button>
+        {/* Atalho de uma vez (não é um vínculo): o círculo só imita o desenho do frame. */}
         {primary && (
-          <Button type="button" variant="outline" onClick={copyPrimary} className="h-10 px-7">
+          <button
+            type="button"
+            onClick={copyPrimary}
+            className="flex items-center gap-2 rounded-sm text-sm focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
+          >
+            <span aria-hidden className="size-4 rounded-full border border-primary" />
             Igual à carteira principal
-          </Button>
+          </button>
         )}
       </div>
     </form>

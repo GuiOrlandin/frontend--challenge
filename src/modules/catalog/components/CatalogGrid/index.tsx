@@ -82,7 +82,7 @@ export function CatalogGrid({ search }: CatalogGridProps) {
       <ul aria-label="NFTs" className={GRID}>
         {items.map((nft, index) => (
           <li key={nft.id}>
-            <NftCard nft={nft} priority={index < 3} actions={<CardActions nft={nft} />} />
+            <NftCard nft={nft} size="lg" priority={index < 3} actions={<CardActions nft={nft} />} />
           </li>
         ))}
       </ul>
@@ -93,7 +93,7 @@ export function CatalogGrid({ search }: CatalogGridProps) {
 
 const pageLinkClass = (active: boolean) =>
   cn(
-    'flex size-8 items-center justify-center rounded-sm border text-sm transition-colors focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
+    'flex size-8 items-center justify-center rounded-sm border text-sm transition lg:text-lg-colors focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
     active
       ? 'border-primary bg-primary font-medium text-primary-foreground'
       : 'border-border bg-background hover:bg-accent',
@@ -155,21 +155,24 @@ function CatalogPagination({ page, totalPages }: { page: number; totalPages: num
   )
 }
 
-/** Carrinho (Edição padrão), favoritar e ver detalhe, na base da imagem (Figma). */
+/** Carrinho (Edição padrão), favoritar e ver detalhe na base da imagem; abaixo de `lg` só o favoritar, no canto (frame mobile). */
 function CardActions({ nft }: { nft: Nft }) {
   return (
     <>
       <AddToCartButton
         nftId={nft.id}
         editionId={nft.defaultEditionId}
-        className="size-7 rounded-sm bg-card text-[#F5F1EB]"
+        className="size-7 rounded-sm bg-card text-[#F5F1EB] max-lg:hidden"
       />
-      <FavoriteButton nftId={nft.id} className="size-7 rounded-sm bg-card text-[#F5F1EB]" />
+      <FavoriteButton
+        nftId={nft.id}
+        className="size-7 rounded-sm bg-card text-[#F5F1EB] max-lg:rounded-full"
+      />
       <Link
         to="/nft/$nftId"
         params={{ nftId: nft.id }}
         aria-label={`Ver detalhes de ${nft.title}`}
-        className="flex size-7 items-center justify-center rounded-sm bg-card text-[#F5F1EB] transition-colors hover:bg-background focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
+        className="flex size-7 items-center justify-center rounded-sm bg-card text-[#F5F1EB] transition-colors max-lg:hidden hover:bg-background focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
       >
         <SearchIcon className="size-5" aria-hidden />
       </Link>

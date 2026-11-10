@@ -39,13 +39,13 @@ export function HeroCarousel() {
       setApi={setApi}
       opts={{ loop: true }}
       aria-label="Destaques"
-      className="min-h-[190px] rounded-2xl bg-[radial-gradient(circle_at_20%_10%,color-mix(in_oklch,var(--primary)_30%,var(--card)),var(--card)_70%)] p-4 lg:rounded-none lg:bg-none lg:p-0"
+      className="min-h-[190px] rounded-2xl bg-[radial-gradient(circle_at_20%_10%,color-mix(in_oklch,var(--primary)_30%,var(--card)),var(--card)_70%)] p-4 lg:rounded-none lg:bg-none lg:p-0 lg:pl-10"
     >
       <div className="grid grid-cols-[1fr_auto] items-center gap-4 lg:gap-10">
         <div className="flex h-full flex-col justify-center gap-1.5 lg:gap-4">
           <p className="text-xs lg:text-sm">Bem-vindo à Kurio</p>
           {/* O frame mobile tem um título mais curto que o do desktop. */}
-          <h1 className="text-base leading-snug font-medium uppercase lg:text-[43px] lg:leading-[1.5]">
+          <h1 className="text-lg leading-snug font-medium uppercase lg:text-43 lg:leading-[1.5]">
             <span className="lg:hidden">Seja dono da cultura digital</span>
             <span className="hidden lg:inline">
               Seja dono do futuro
@@ -53,7 +53,7 @@ export function HeroCarousel() {
               da arte digital
             </span>
           </h1>
-          <p className="text-xs leading-snug text-option lg:max-w-md lg:text-sm lg:leading-relaxed">
+          <p className="text-xs leading-snug text-option lg:max-w-[33rem] lg:text-sm lg:leading-relaxed">
             <span className="lg:hidden">
               Descubra NFTs selecionados de criadores do mundo todo.
             </span>
@@ -71,8 +71,8 @@ export function HeroCarousel() {
           </Link>
           <Button
             asChild
-            size="sm"
-            className="mt-4 hidden self-start px-5 uppercase lg:inline-flex"
+            size="lg"
+            className="mt-4 hidden self-start px-9 text-base uppercase lg:inline-flex"
           >
             <Link to="/" hash="catalogo">
               Explorar
@@ -177,7 +177,7 @@ function HeroArt(props: {
 
 function Dots(props: { count: number; selected: number; onSelect: (index: number) => void }) {
   return (
-    <div className="flex gap-1 max-lg:absolute lg:gap-0 max-lg:bottom-1 max-lg:left-1/2 max-lg:-translate-x-1/2 lg:mt-10 lg:mr-[70px] lg:self-end">
+    <div className="flex max-lg:absolute max-lg:bottom-1 max-lg:left-1/2 max-lg:-translate-x-1/2 lg:mt-10 lg:mr-[70px] lg:self-end">
       {Array.from({ length: props.count }, (_, index) => (
         <button
           key={index}
@@ -185,7 +185,7 @@ function Dots(props: { count: number; selected: number; onSelect: (index: number
           aria-label={`Mostrar destaque ${index + 1}`}
           aria-current={index === props.selected ? 'true' : undefined}
           onClick={() => props.onSelect(index)}
-          className="flex size-6 items-center justify-center rounded-full lg:-mx-1 focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
+          className="flex size-6 items-center justify-center rounded-full -mx-1 focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
         >
           <span
             className={cn(

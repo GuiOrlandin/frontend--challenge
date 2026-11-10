@@ -45,7 +45,7 @@ export function HomePage() {
 
   return (
     // pb-8 + mt-16 do footer = 96 px até o rodapé (Figma).
-    <PageContainer className="flex flex-col gap-6 py-4 lg:pt-24 lg:pb-8">
+    <PageContainer className="flex flex-col gap-6 py-4 lg:pt-8 lg:pb-8">
       {/* Abaixo de `lg`: busca e filtros no topo (frame mobile). No desktop, a busca é a do header. */}
       <div className="flex items-center gap-3 lg:hidden">
         <CatalogSearch q={search.q} onSearch={onSearch} />
@@ -65,7 +65,9 @@ export function HomePage() {
                 Os filtros se aplicam ao catálogo assim que são escolhidos.
               </SheetDescription>
             </SheetHeader>
-            <div className="px-4 pb-8">
+            <div className="flex flex-col gap-6 px-4 pb-8">
+              {/* Abaixo de `lg` a ordenação fica aqui: o frame mobile não tem a linha "Ordenar por". */}
+              <SortSelect value={search.sort} onChange={(sort) => void update({ sort })} />
               <FiltersPanel />
             </div>
           </SheetContent>
@@ -77,7 +79,7 @@ export function HomePage() {
       <section
         id="catalogo"
         aria-labelledby="catalogo-titulo"
-        className="grid scroll-mt-4 gap-10 lg:mt-6 lg:grid-cols-[19.375rem_1fr]"
+        className="grid scroll-mt-4 gap-10 lg:mt-6 lg:grid-cols-[19.375rem_1fr] lg:gap-x-12"
       >
         <h2 id="catalogo-titulo" className="sr-only">
           Catálogo
@@ -90,10 +92,13 @@ export function HomePage() {
           <Spotlight />
         </div>
 
-        <div className="flex min-w-0 flex-col gap-6">
+        {/* lg: o select de ordenação tem 36 px; com 14 px a grade começa 50 px abaixo do topo (Figma). */}
+        <div className="flex min-w-0 flex-col gap-6 lg:gap-3.5">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <CatalogTabs active={search.tab} />
-            <SortSelect value={search.sort} onChange={(sort) => void update({ sort })} />
+            <div className="hidden lg:block">
+              <SortSelect value={search.sort} onChange={(sort) => void update({ sort })} />
+            </div>
           </div>
           <CatalogGrid search={search} />
         </div>

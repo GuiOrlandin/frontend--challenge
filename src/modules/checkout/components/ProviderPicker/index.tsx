@@ -8,7 +8,7 @@ import type { ProviderPickerProps } from './types'
 export function ProviderPicker({ value, onChange }: ProviderPickerProps) {
   return (
     <div className="flex flex-col gap-3">
-      <h2 id="provedor" className="font-bold md:text-center">
+      <h2 id="provedor" className="font-bold md:text-center md:text-17">
         Carteira e rede
       </h2>
       <RadioGroup
@@ -33,7 +33,7 @@ export function ProviderPicker({ value, onChange }: ProviderPickerProps) {
                 provider.charAt(0).toUpperCase()
               )}
             </span>
-            <span className="flex-1 text-sm">{WALLET_PROVIDER_LABELS[provider]}</span>
+            <span className="flex-1 text-sm md:text-15">{WALLET_PROVIDER_LABELS[provider]}</span>
             <RadioGroupItem id={`provedor-${provider}`} value={provider} />
           </label>
         ))}

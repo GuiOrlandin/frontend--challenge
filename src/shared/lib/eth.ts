@@ -39,12 +39,12 @@ export function compare(a: Eth, b: Eth): -1 | 0 | 1 {
   return diff === 0n ? 0 : diff > 0n ? 1 : -1
 }
 
-const formatter = new Intl.NumberFormat('pt-BR', {
+const formatter = new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 6,
 })
 
-/** "1234.5" → "1.234,50". Passa a string direto ao Intl (precisão exata, sem Number). */
+/** "1234.5" → "1,234.50" (ponto decimal, como no Figma). Passa a string direto ao Intl (precisão exata, sem Number). */
 export function formatEth(value: Eth): string {
   return formatter.format(value as Intl.StringNumericLiteral)
 }

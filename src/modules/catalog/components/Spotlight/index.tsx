@@ -31,7 +31,7 @@ export function Spotlight() {
       <h2 id="destaque-titulo" className="px-4 text-2xl font-medium text-primary uppercase">
         NFT em destaque
       </h2>
-      <p className="text-center text-[22px] font-bold uppercase">Oferta limitada</p>
+      <p className="text-center text-22 font-bold uppercase">Oferta limitada</p>
       <Link
         to="/nft/$nftId"
         params={{ nftId: nft.id }}

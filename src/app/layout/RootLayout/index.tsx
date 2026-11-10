@@ -1,4 +1,4 @@
-import CartIcon from '@/assets/icons/cart.svg?react'
+import CartIcon from '@/assets/icons/cart-add.svg?react'
 import { AccountMenu, AuthDialog, useSessionSync } from '@/modules/auth'
 import { CartBadge } from '@/modules/cart'
 import { Toaster } from '@/shared/ui/sonner'
@@ -24,7 +24,7 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
       <Header
         cart={
           <CartBadge className="rounded-sm p-1 hover:text-primary">
-            <CartIcon className="size-5" />
+            <CartIcon className="size-6" />
           </CartBadge>
         }
         account={<AccountMenu />}

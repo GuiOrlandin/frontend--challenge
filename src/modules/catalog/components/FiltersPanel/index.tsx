@@ -90,7 +90,7 @@ function Filters({ facets }: { facets: Facets }) {
 function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h3 className="text-base font-bold">{title}</h3>
+      <h3 className="text-lg font-bold">{title}</h3>
       <ul className="flex flex-col gap-1">{children}</ul>
     </section>
   )
@@ -109,7 +109,7 @@ function FilterOption(props: {
         aria-pressed={props.selected}
         onClick={props.onClick}
         className={cn(
-          'flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-sm transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
+          'flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-15 transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
           props.selected ? 'font-bold text-option-active' : 'text-option',
         )}
       >
@@ -137,7 +137,7 @@ function PriceRange(props: {
 
   return (
     <section className="flex flex-col gap-3">
-      <h3 className="text-base font-bold">Faixa de preço</h3>
+      <h3 className="text-lg font-bold">Faixa de preço</h3>
       <Slider
         min={min}
         max={max}
@@ -147,12 +147,12 @@ function PriceRange(props: {
         thumbLabels={['Preço mínimo', 'Preço máximo']}
         className="py-2"
       />
-      <p className="text-sm">
+      <p className="text-15">
         Preço: {formatEth(fromCents(low))} – {formatEth(fromCents(high))} ETH
       </p>
       <Button
         size="sm"
-        className="self-start"
+        className="self-start text-base"
         // Os extremos da faixa equivalem a "sem limite": não vão para a URL.
         onClick={() =>
           props.onApply(

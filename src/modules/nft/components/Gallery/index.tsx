@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import SearchIcon from '@/assets/icons/search.svg?react'
+import ZoomIcon from '@/assets/icons/zoom.svg?react'
 import type { Nft } from '@/shared/contracts'
 import { cn } from '@/shared/lib/utils'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/shared/ui/dialog'
@@ -16,7 +16,7 @@ export function Gallery({ images, rare }: Pick<Nft, 'images' | 'rare'>) {
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row-reverse lg:items-start lg:gap-5">
-      <div className="relative flex-1 overflow-hidden rounded-sm bg-card p-3 lg:p-4">
+      <div className="relative flex-1 overflow-hidden rounded-2xl md:rounded-sm md:bg-card md:p-3 lg:p-4">
         <img
           src={image.src}
           alt={image.alt}
@@ -27,16 +27,16 @@ export function Gallery({ images, rare }: Pick<Nft, 'images' | 'rare'>) {
           className="aspect-square w-full rounded-2xl object-cover"
         />
         {rare && (
-          <span className="absolute top-0 left-0 rounded-br-lg bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+          <span className="absolute top-2 left-0 z-10 bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
             RARO
           </span>
         )}
         <Dialog>
           <DialogTrigger
             aria-label="Ampliar imagem"
-            className="absolute top-1.5 right-1.5 flex size-8 items-center justify-center rounded-full bg-background text-foreground hover:text-primary focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
+            className="absolute top-2.5 right-2.5 flex size-[30px] items-center justify-center rounded-full bg-[#3F2319] text-[#F5F1EB] hover:text-primary max-md:hidden focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
           >
-            <SearchIcon className="size-4" aria-hidden />
+            <ZoomIcon className="size-5" aria-hidden />
           </DialogTrigger>
           <DialogContent className="max-w-[calc(100%-2rem)] p-2 sm:max-w-3xl">
             <DialogTitle className="sr-only">{image.alt}</DialogTitle>
@@ -52,7 +52,7 @@ export function Gallery({ images, rare }: Pick<Nft, 'images' | 'rare'>) {
       </div>
 
       {/* Figma: sempre 5 miniaturas; faltando imagens, repete a principal. */}
-      <ul aria-label="Imagens" className="flex gap-3 lg:flex-col">
+      <ul aria-label="Imagens" className="flex gap-3 max-md:hidden lg:flex-col">
         {thumbs.map((img, index) => (
           <li key={index} className="min-w-0 flex-1 lg:flex-none">
             <button

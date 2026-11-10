@@ -41,9 +41,9 @@ describe('describeQuoteChanges', () => {
       networkFee: '0.02',
     }
     expect(describeQuoteChanges(quote, next)).toEqual([
-      'Emerald Ape #042: preço mudou de 1,19 ETH para 1,309 ETH',
+      'Emerald Ape #042: preço mudou de 1.19 ETH para 1.309 ETH',
       'Cupom KURIO10 removido',
-      'Taxa de rede mudou de 0,016 ETH para 0,02 ETH',
+      'Taxa de rede mudou de 0.016 ETH para 0.02 ETH',
     ])
   })
 

@@ -6,4 +6,6 @@ export interface NftCardProps {
   actions?: React.ReactNode
   /** Arte acima da dobra: carrega já, com prioridade (LCP). */
   priority?: boolean
+  /** `lg`: grade do catálogo, com nome e preço maiores no desktop (Figma). */
+  size?: 'md' | 'lg'
 }

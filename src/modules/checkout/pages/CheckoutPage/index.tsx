@@ -33,7 +33,7 @@ export function CheckoutPage() {
   const canGoBack = useCanGoBack()
 
   return (
-    <PageContainer className="flex flex-col gap-5 pt-4 pb-0 md:gap-6 md:py-6 lg:pt-10 lg:pb-8">
+    <PageContainer className="flex flex-col gap-5 pt-4 pb-0 max-md:min-h-dvh md:gap-6 md:py-6 lg:pt-10 lg:pb-8">
       {/* Mobile: voltar e título no topo, sem trilha (frame mobile). */}
       <div className="grid grid-cols-[2.25rem_1fr_2.25rem] items-center md:hidden">
         <button
@@ -44,12 +44,12 @@ export function CheckoutPage() {
         >
           <BackIcon className="size-9" aria-hidden />
         </button>
-        <p aria-hidden className="text-center text-lg font-bold">
+        <p aria-hidden className="text-center text-xl font-bold">
           Pagamento com carteira
         </p>
       </div>
       <Breadcrumb className="hidden md:block">
-        <BreadcrumbList className="text-sm font-bold text-foreground">
+        <BreadcrumbList className="text-15 font-bold text-foreground">
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link to="/">Início</Link>

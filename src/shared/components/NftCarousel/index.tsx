@@ -28,7 +28,7 @@ export function NftCarousel({ title, nfts, actions }: NftCarouselProps) {
 
   return (
     <Carousel setApi={setApi} opts={{ align: 'start' }} aria-labelledby={titleId}>
-      <h2 id={titleId} className="mb-6 border-b pb-2 text-sm font-bold text-primary">
+      <h2 id={titleId} className="mb-6 border-b pb-2 text-sm font-bold text-primary lg:text-17">
         {title}
       </h2>
       <CarouselContent>

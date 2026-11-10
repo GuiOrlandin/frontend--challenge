@@ -35,7 +35,7 @@ export function CartLine({ line, highlighted = false }: CartLineProps) {
         className="row-span-2 h-full min-h-25 w-20 object-cover md:row-span-1 md:size-16 md:min-h-0 md:rounded-sm"
       />
       <div className="row-span-2 flex min-w-0 flex-col gap-1 py-2.5 md:row-span-1 md:gap-0 md:py-0">
-        <p className="truncate text-sm font-bold">
+        <p className="truncate text-15 font-bold md:text-base">
           <Link
             to="/nft/$nftId"
             params={{ nftId: line.nftId }}
@@ -44,10 +44,10 @@ export function CartLine({ line, highlighted = false }: CartLineProps) {
             {title}
           </Link>
         </p>
-        <p className="hidden text-xs whitespace-nowrap text-option md:block">
+        <p className="hidden text-sm whitespace-nowrap text-option md:block">
           ID do token: #{tokenId.padStart(4, '0')}
         </p>
-        <p className="text-xs text-option md:hidden">Edição: {editionLabel}</p>
+        <p className="text-sm text-option md:hidden">Edição: {editionLabel}</p>
         {line.status === 'unavailable' && (
           <p className="text-xs text-destructive">Edição esgotada. Remova para continuar.</p>
         )}
@@ -64,7 +64,7 @@ export function CartLine({ line, highlighted = false }: CartLineProps) {
           <EthPrice value={line.lineTotal} />
         </p>
       </div>
-      <p className="hidden text-sm font-bold text-option md:block">
+      <p className="hidden text-base font-bold text-option md:block">
         <span className="sr-only">Preço: </span>
         <EthPrice value={line.unitPrice} />
       </p>
@@ -75,9 +75,9 @@ export function CartLine({ line, highlighted = false }: CartLineProps) {
         disabled={line.status === 'unavailable'}
         onChange={(quantity) => change.mutate({ lineId: line.lineId, quantity })}
         // Mobile: botões menores e escuros, como no frame.
-        className="col-start-3 row-start-1 gap-1 pt-2.5 pr-2.5 max-md:[&_button]:size-6 max-md:[&_button]:bg-accent max-md:[&_button]:text-foreground max-md:[&_input]:h-6 max-md:[&_input]:w-6 max-md:[&_input]:text-sm max-md:[&_svg]:size-3.5 md:col-start-auto md:row-start-auto md:gap-2 md:p-0"
+        className="col-start-3 row-start-1 gap-1 pt-2.5 pr-2.5 max-md:[&_button]:size-6 max-md:[&_button]:bg-accent max-md:[&_button]:text-foreground max-md:[&_input]:h-6 max-md:[&_input]:w-6 max-md:[&_input]:text-base md:[&_input]:text-17 max-md:[&_svg]:size-3.5 md:col-start-auto md:row-start-auto md:gap-2 md:p-0"
       />
-      <p className="hidden text-sm font-bold text-primary md:block">
+      <p className="hidden text-base font-bold text-primary md:block">
         <span className="sr-only">Total: </span>
         <EthPrice value={line.lineTotal} />
       </p>

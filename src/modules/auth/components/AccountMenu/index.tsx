@@ -22,7 +22,7 @@ export function AccountMenu() {
   if (session.isPending) return <Skeleton className="h-8 w-20" />
   if (!session.data) {
     return (
-      <Button asChild size="sm">
+      <Button asChild size="sm" className="text-base">
         <Link to="." search={(prev) => ({ ...prev, auth: 'entrar' as const })}>
           <LogInIcon className="size-4" />
           Entrar
@@ -37,6 +37,7 @@ export function AccountMenu() {
         <Button
           size="sm"
           variant="outline"
+          className="text-base"
           aria-label={`Conta de ${session.data.user.displayName}`}
         >
           {session.data.user.displayName}

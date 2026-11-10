@@ -222,15 +222,10 @@ function createEditions(random: Random, number: number, card: FigmaCard): Editio
 }
 
 function galleryFor(random: Random, main: Artwork, title: string): Nft['images'] {
-  const others = ARTWORKS.filter((artwork) => artwork !== main)
-  const count = random.int(0, 2)
-  return [
-    { src: artworkUrl(main), alt: title },
-    ...others.slice(0, count).map((artwork, i) => ({
-      src: artworkUrl(artwork),
-      alt: `${title}, imagem ${i + 2}`,
-    })),
-  ]
+  // Sorteio mantido só para não deslocar a sequência da seed (preços, estoques etc.).
+  random.int(0, 2)
+  // Figma: a galeria mostra só a arte do próprio NFT.
+  return [{ src: artworkUrl(main), alt: title }]
 }
 
 function collectionById(id: string): (typeof COLLECTIONS)[number] {

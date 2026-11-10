@@ -13,7 +13,7 @@ const MARKET_PATHS = ['/nft/', '/carrinho', '/pagamento']
 
 const navLinkClass = (active: boolean) =>
   cn(
-    'relative py-5 text-sm transition-colors hover:text-primary',
+    'relative py-5 text-base transition-colors hover:text-primary',
     active &&
       'font-medium text-primary after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary',
   )
@@ -50,8 +50,8 @@ export function Header({ cart, account }: HeaderProps) {
               Mercado
             </Link>
             {/* Estáticos (SPEC §1): só texto. */}
-            <span className="py-5 text-sm">Criadores</span>
-            <span className="py-5 text-sm">Aprenda</span>
+            <span className="py-5 text-base">Criadores</span>
+            <span className="py-5 text-base">Aprenda</span>
           </nav>
 
           <div className="flex items-center gap-4">

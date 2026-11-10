@@ -40,10 +40,14 @@ export function AuthDialog() {
         )}
       >
         <header className="grid gap-4 text-center">
-          <p aria-hidden="true" className="text-2xl font-bold tracking-widest lg:hidden">
+          <p aria-hidden="true" className="text-32 font-bold tracking-widest lg:hidden">
             KURIO
           </p>
-          <DialogTitle className="mt-10 text-base font-bold lg:sr-only">{title}</DialogTitle>
+          <DialogTitle
+            className={cn('mt-10 font-bold lg:sr-only', isLogin ? 'text-xl' : 'text-lg')}
+          >
+            {title}
+          </DialogTitle>
           {/* Abas do desktop: mesmo destino do link "Crie uma conta" do mobile. */}
           <nav
             aria-label="Acesso"
@@ -67,7 +71,7 @@ export function AuthDialog() {
               Criar conta
             </Link>
           </nav>
-          <DialogDescription className="text-[13px] max-lg:sr-only">
+          <DialogDescription className="text-13 max-lg:sr-only">
             {isLogin
               ? 'Entre para gerenciar sua carteira, coleção e perfil de criador.'
               : 'Crie seu perfil de colecionador e conecte uma carteira quando quiser.'}
@@ -77,7 +81,7 @@ export function AuthDialog() {
         {isLogin ? <LoginForm /> : <RegisterForm />}
         <SocialLogin />
 
-        <p className="text-center text-xs lg:hidden">
+        <p className="text-center text-15 lg:hidden">
           {isLogin ? 'Novo na Kurio? ' : 'Já tem conta? '}
           <Link
             to="."

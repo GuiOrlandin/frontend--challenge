@@ -24,9 +24,9 @@ export function SelectField({
 
   return (
     <div className="grid content-start gap-3">
-      <Label htmlFor={id} className="font-normal">
+      <Label htmlFor={id} className="text-15 font-normal">
         {label}
-        <span aria-hidden="true" className="-ml-1.5 text-base leading-none text-primary">
+        <span aria-hidden="true" className="-ml-1.5 text-22 leading-none text-primary">
           *
         </span>
       </Label>

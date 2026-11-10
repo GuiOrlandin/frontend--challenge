@@ -1,6 +1,6 @@
-import LinkedinIcon from '@/assets/icons/linkedin.svg?react'
+import LinkedinIcon from '@/assets/icons/linkedin-filled.svg?react'
 import MailIcon from '@/assets/icons/mail.svg?react'
-import TwitterIcon from '@/assets/icons/twitter.svg?react'
+import TwitterIcon from '@/assets/icons/twitter-filled.svg?react'
 
 const linkClass =
   'flex size-6 items-center justify-center rounded-sm hover:text-primary focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none'
@@ -13,7 +13,7 @@ export function ShareLinks({ title }: { title: string }) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm font-bold">Compartilhar este NFT:</span>
+      <span className="text-15 font-bold">Compartilhar este NFT:</span>
       <ul className="flex items-center gap-1">
         <li>
           <a
@@ -23,7 +23,7 @@ export function ShareLinks({ title }: { title: string }) {
             aria-label="Compartilhar no LinkedIn (abre em nova aba)"
             className={linkClass}
           >
-            <LinkedinIcon className="size-4" aria-hidden />
+            <LinkedinIcon className="size-[15px]" aria-hidden />
           </a>
         </li>
         <li>
@@ -45,7 +45,7 @@ export function ShareLinks({ title }: { title: string }) {
             aria-label="Compartilhar no X (abre em nova aba)"
             className={linkClass}
           >
-            <TwitterIcon className="size-4" aria-hidden />
+            <TwitterIcon className="h-[13px] w-4" aria-hidden />
           </a>
         </li>
       </ul>

@@ -12,7 +12,7 @@ interface EditionPickerProps {
 export function EditionPicker({ editions, value, onChange }: EditionPickerProps) {
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="mb-1 text-sm font-bold">Edição:</legend>
+      <legend className="mb-1 text-15 font-bold">Edição:</legend>
       <RadioGroup value={value} onValueChange={onChange} className="flex flex-wrap gap-1">
         {/* Ordem do Figma: menor tiragem primeiro, aberta por último. */}
         {editions
@@ -25,7 +25,7 @@ export function EditionPicker({ editions, value, onChange }: EditionPickerProps)
                 key={edition.id}
                 htmlFor={id}
                 className={cn(
-                  'cursor-pointer rounded-full border px-1.5 py-0.5 text-[13px] text-option uppercase has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-ring has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:text-primary',
+                  'cursor-pointer rounded-full border px-1.5 py-0.5 text-sm text-option uppercase has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-ring has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:text-primary',
                   soldOut && 'cursor-not-allowed line-through opacity-60',
                 )}
               >

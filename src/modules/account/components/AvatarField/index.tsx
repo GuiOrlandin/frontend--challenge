@@ -52,7 +52,7 @@ export function AvatarField({ userId, avatarUrl }: AvatarFieldProps) {
 
   return (
     <div className="grid content-start gap-3">
-      <span className="text-sm">Avatar</span>
+      <span className="text-15">Avatar</span>
       <div className="flex items-center gap-4">
         <img
           src={src ?? avatarPlaceholderUrl}

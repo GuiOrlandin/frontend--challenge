@@ -23,7 +23,7 @@ export function CartBadge({ children, className }: CartBadgeProps) {
       {count > 0 && (
         <span
           aria-hidden
-          className="absolute -top-1 -right-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary px-1 text-[9px] leading-none font-bold text-primary-foreground"
+          className="absolute -top-1 -right-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary px-1 text-10 leading-none font-bold text-primary-foreground"
         >
           {count > 99 ? '99+' : count}
         </span>

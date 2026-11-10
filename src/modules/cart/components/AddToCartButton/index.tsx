@@ -1,6 +1,6 @@
 import { toast } from 'sonner'
 
-import CartIcon from '@/assets/icons/cart.svg?react'
+import CartIcon from '@/assets/icons/cart-add.svg?react'
 import { cn } from '@/shared/lib/utils'
 
 import { useAddToCart } from '../../hooks/useCart'
@@ -12,6 +12,7 @@ export function AddToCartButton({
   nftId,
   editionId,
   quantity = 1,
+  icon,
   className,
 }: AddToCartButtonProps) {
   const addToCart = useAddToCart()
@@ -32,7 +33,7 @@ export function AddToCartButton({
         className,
       )}
     >
-      <CartIcon className="size-5" aria-hidden />
+      {icon ?? <CartIcon className="size-5" aria-hidden />}
     </button>
   )
 }

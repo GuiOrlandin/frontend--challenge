@@ -56,7 +56,7 @@ describe('describeNftChanges', () => {
   it('anuncia a mudança de preço da linha', () => {
     expect(describeNftChanges([line()], nftWith({ price: '1.29', available: 4 }))).toEqual({
       lineIds: ['line_nft_001_ed_001_a'],
-      messages: ['Emerald Ape #042: preço mudou de 1,19 para 1,29 ETH'],
+      messages: ['Emerald Ape #042: preço mudou de 1.19 para 1.29 ETH'],
     })
   })
 

@@ -33,7 +33,7 @@ export function CartPage() {
   const canGoBack = useCanGoBack()
 
   return (
-    <PageContainer className="flex flex-col gap-5 pt-4 pb-0 md:gap-6 md:py-6 lg:pt-10 lg:pb-8">
+    <PageContainer className="flex flex-col gap-5 pt-4 pb-0 max-md:min-h-dvh md:gap-6 md:py-6 lg:pt-10 lg:pb-8">
       {/* Mobile: voltar e título no topo, sem trilha (frame mobile). */}
       <div className="grid grid-cols-[2.25rem_1fr_2.25rem] items-center md:hidden">
         <button
@@ -44,12 +44,12 @@ export function CartPage() {
         >
           <BackIcon className="size-9" aria-hidden />
         </button>
-        <p aria-hidden className="text-center text-lg font-bold">
+        <p aria-hidden className="text-center text-xl font-bold">
           Carrinho de NFTs
         </p>
       </div>
       <Breadcrumb className="hidden md:block">
-        <BreadcrumbList className="text-sm font-bold text-foreground">
+        <BreadcrumbList className="text-15 font-bold text-foreground">
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link to="/">Início</Link>
@@ -87,14 +87,15 @@ export function CartPage() {
           }
         />
       ) : (
-        <div className="grid gap-6 md:gap-10 lg:grid-cols-[minmax(0,1fr)_19.5rem] lg:gap-20">
+        // Mobile: tela cheia, resumo no rodapé da tela (frame).
+        <div className="grid gap-6 max-md:flex-1 max-md:content-between md:gap-10 lg:grid-cols-[minmax(0,1fr)_19.5rem] lg:gap-20">
           <section aria-labelledby="itens" className="flex min-w-0 flex-col gap-3">
             <h2 id="itens" className="sr-only">
               Itens
             </h2>
             <div
               aria-hidden
-              className="hidden grid-cols-[4rem_minmax(0,1fr)_6.5rem_7rem_6.5rem_2.5rem] gap-x-3 border-b pb-2 text-sm font-bold md:grid"
+              className="hidden grid-cols-[4rem_minmax(0,1fr)_6.5rem_7rem_6.5rem_2.5rem] gap-x-3 border-b pb-2 text-base font-bold md:grid"
             >
               <span className="col-span-2">NFTs</span>
               <span>Preço</span>

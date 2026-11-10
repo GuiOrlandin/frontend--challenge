@@ -7,19 +7,13 @@ import { Skeleton } from '@/shared/ui/skeleton'
 
 const SHOWCASE_SIZE = 8
 
-/** "Mais desta coleção" (sem o atual) e "Colecionadores também viram" (SPEC §13.6). */
+/** "Mais desta coleção" (sem o atual). O Figma do detalhe não tem "Colecionadores também viram". */
 export function Showcases({ nft }: { nft: Nft }) {
   const sameCollection = useQuery(
     catalogQueries.list({ collection: nft.collection.id, pageSize: SHOWCASE_SIZE }),
   )
-  const trending = useQuery(catalogQueries.list({ tab: 'trending', pageSize: SHOWCASE_SIZE }))
 
-  return (
-    <div className="flex flex-col gap-16">
-      <Showcase title="Mais desta coleção" query={sameCollection} exclude={nft.id} />
-      <Showcase title="Colecionadores também viram" query={trending} exclude={nft.id} />
-    </div>
-  )
+  return <Showcase title="Mais desta coleção" query={sameCollection} exclude={nft.id} />
 }
 
 /** Complementar: com erro ou vazia, a vitrine some (o conteúdo principal já está na tela). */

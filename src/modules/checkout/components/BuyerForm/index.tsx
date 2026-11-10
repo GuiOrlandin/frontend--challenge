@@ -15,6 +15,7 @@ import {
 } from '@/shared/contracts'
 import { withEnsSuffix } from '@/shared/lib/ens'
 import { type FieldErrors, fieldErrorsOf } from '@/shared/lib/form'
+import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/button'
 import { Label } from '@/shared/ui/label'
 import { Textarea } from '@/shared/ui/textarea'
@@ -65,6 +66,10 @@ export function BuyerForm({ userId, profile, wallets, cart }: BuyerFormProps) {
   // Campos não controlados: trocar a `key` os remonta com os novos `defaultValue`.
   const [fillCount, setFillCount] = useState(0)
   const [errors, setErrors] = useState<FieldErrors>({})
+  // Mobile (frame): os dados vêm da Carteira escolhida e ficam recolhidos; abrem pelo ⋮ ou com erro.
+  const [editing, setEditing] = useState(false)
+  const fieldsId = useId()
+  const fieldsOpen = editing || Object.keys(errors).length > 0
 
   const wallet = wallets.find((w) => w.id === walletId)!
   const other = wallets.find((w) => w.id !== walletId)
@@ -110,14 +115,28 @@ export function BuyerForm({ userId, profile, wallets, cart }: BuyerFormProps) {
       noValidate
       onChange={saveDraft}
       onSubmit={onSubmit}
-      className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_25rem]"
+      // Mobile: coluna única com o CTA no pé da tela (frame).
+      className="grid gap-8 max-md:flex max-md:flex-1 max-md:flex-col max-md:gap-5 lg:grid-cols-[minmax(0,1fr)_25rem]"
     >
       <section aria-labelledby="perfil-colecionador" className="flex min-w-0 flex-col gap-5">
-        <WalletPicker variant="card" wallet={wallet} canSwitch={!!other} onSwitch={switchWallet} />
-        <h2 id="perfil-colecionador" className="font-bold max-md:sr-only">
+        <WalletPicker
+          variant="card"
+          wallet={wallet}
+          wallets={wallets}
+          canSwitch={!!other}
+          onSwitch={switchWallet}
+          editing={fieldsOpen}
+          onEdit={() => setEditing(!fieldsOpen)}
+          fieldsId={fieldsId}
+        />
+        <h2 id="perfil-colecionador" className="text-17 font-bold max-md:sr-only">
           Perfil do colecionador
         </h2>
-        <div className="grid gap-x-6 gap-y-5 md:grid-cols-2">
+        {/* Recolhido só some da tela: os campos continuam no FormData do envio. */}
+        <div
+          id={fieldsId}
+          className={cn('grid gap-x-6 gap-y-5 md:grid-cols-2', !fieldsOpen && 'max-md:hidden')}
+        >
           <div key={`campos-${fillCount}`} className="contents">
             <Field
               name="displayName"
@@ -195,12 +214,13 @@ export function BuyerForm({ userId, profile, wallets, cart }: BuyerFormProps) {
           <WalletPicker
             variant="toggle"
             wallet={wallet}
+            wallets={wallets}
             canSwitch={!!other}
             onSwitch={switchWallet}
           />
           <div key={`nota-${fillCount}`} className="contents">
             <div className="grid content-start gap-3 md:col-start-1">
-              <Label htmlFor={noteId} className="font-normal">
+              <Label htmlFor={noteId} className="text-15 font-normal">
                 Observação do colecionador (opcional)
               </Label>
               <Textarea
@@ -222,7 +242,7 @@ export function BuyerForm({ userId, profile, wallets, cart }: BuyerFormProps) {
         </div>
       </section>
 
-      <aside className="flex flex-col gap-6 max-md:pb-8">
+      <aside className="flex flex-col gap-6 max-md:flex-1 max-md:pb-8">
         <CheckoutSummary cart={cart} />
         {/* Mobile: só o Total aparece no resumo, e o frame põe "Carteira e rede" antes dele. */}
         <div className="max-md:order-first">
@@ -230,7 +250,7 @@ export function BuyerForm({ userId, profile, wallets, cart }: BuyerFormProps) {
         </div>
         <Button
           type="submit"
-          className="h-10 rounded-sm text-sm font-bold max-md:h-12 max-md:rounded-full max-md:bg-linear-to-r max-md:from-primary max-md:to-[#A86D3D]"
+          className="h-10 rounded-sm text-15 font-bold max-md:mt-auto max-md:h-12 max-md:rounded-full max-md:bg-linear-to-r max-md:from-primary max-md:to-[#A86D3D]"
         >
           Continuar
         </Button>

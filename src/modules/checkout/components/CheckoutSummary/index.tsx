@@ -23,10 +23,10 @@ export function CheckoutSummary({ cart, quote }: CheckoutSummaryProps) {
   return (
     <section aria-labelledby="seus-nfts" className="flex flex-col gap-4">
       <div className="flex flex-col gap-2 max-md:hidden">
-        <h2 id="seus-nfts" className="font-bold">
+        <h2 id="seus-nfts" className="text-17 font-bold">
           Seus NFTs
         </h2>
-        <p aria-hidden className="flex justify-between text-sm font-bold">
+        <p aria-hidden className="flex justify-between text-base font-bold">
           <span>NFTs</span>
           <span>Subtotal</span>
         </p>
@@ -49,22 +49,22 @@ export function CheckoutSummary({ cart, quote }: CheckoutSummaryProps) {
                 <span aria-hidden className="size-14 rounded-sm bg-muted" />
               )}
               <div className="min-w-0">
-                <p className="truncate text-sm font-bold">{line.title}</p>
+                <p className="truncate text-base font-bold">{line.title}</p>
                 {line.nft && (
-                  <p className="text-xs text-option">
+                  <p className="text-sm text-option">
                     ID do token: #{line.nft.tokenId.padStart(4, '0')}
                   </p>
                 )}
               </div>
-              <span className="text-xs text-option">
+              <span className="text-sm text-option">
                 <span className="sr-only">Quantidade: </span>(x {line.quantity})
               </span>
-              <EthPrice value={line.lineTotal} className="font-bold text-primary" />
+              <EthPrice value={line.lineTotal} className="text-lg font-bold text-primary" />
             </li>
           ))}
         </ul>
         {!quote && (
-          <p className="text-center text-xs">
+          <p className="text-center text-sm">
             Tem um código promocional?{' '}
             <Link to="/carrinho" className="text-primary underline underline-offset-2">
               Aplique aqui
@@ -72,29 +72,27 @@ export function CheckoutSummary({ cart, quote }: CheckoutSummaryProps) {
           </p>
         )}
       </div>
-      <dl className="flex flex-col gap-3 text-sm">
+      <dl className="flex flex-col gap-3 text-15">
         <div className="flex items-center justify-between gap-4 max-md:hidden">
           <dt>Subtotal</dt>
-          <dd className="text-base">
+          <dd className="text-lg">
             <EthPrice value={subtotal} />
           </dd>
         </div>
         <div className="flex items-center justify-between gap-4 max-md:hidden">
           <dt>Desconto do lançamento</dt>
-          <dd className="text-xs">
+          <dd className="text-15">
             (-) <EthPrice value={discount} />
           </dd>
         </div>
         <div className="grid grid-cols-[1fr_auto] items-center gap-x-4 max-md:hidden">
           <dt>Taxa de rede</dt>
-          <dd className="text-base">
+          <dd className="text-lg">
             <EthPrice value={networkFee} />
           </dd>
-          {!quote && (
-            <dd className="col-span-2 text-right text-[10px] text-primary">Taxa estimada</dd>
-          )}
+          {!quote && <dd className="col-span-2 text-right text-xs text-primary">Taxa estimada</dd>}
         </div>
-        <div className="flex items-center justify-between gap-4 font-bold md:mt-2 md:border-t md:pt-4">
+        <div className="flex items-center justify-between gap-4 text-base font-bold md:mt-2 md:border-t md:pt-4">
           <dt className="max-md:ml-auto">Total</dt>
           <dd className="text-lg">
             <EthPrice value={total} className="text-primary" />

@@ -17,6 +17,8 @@ const navItemClass = (active: boolean) =>
 /** Navegação abaixo de `md` (SPEC §4.4). Perfil sem sessão cai no login pelo guard. */
 export function MobileBottomNav() {
   const { pathname } = useLocation()
+  // Detalhe, carrinho e pagamento têm a própria barra de ação no pé da tela (frames mobile).
+  if (/^\/(nft\/|carrinho|pagamento)/.test(pathname)) return null
 
   return (
     <nav

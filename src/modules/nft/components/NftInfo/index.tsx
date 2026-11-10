@@ -11,7 +11,7 @@ const NETWORK_LABELS: Record<Network, string> = {
 export function Rating({ rating }: Pick<Nft, 'rating'>) {
   const rounded = Math.round(rating.average)
   return (
-    <p className="flex items-center gap-1.5 text-sm">
+    <p className="flex items-center gap-1.5 text-15">
       <span aria-hidden className="text-base tracking-[0.15em] text-primary">
         {'★'.repeat(rounded)}
         <span className="text-muted-foreground">{'★'.repeat(5 - rounded)}</span>
@@ -32,7 +32,7 @@ export function NftInfo({ nft }: { nft: Nft }) {
   return (
     <Tabs defaultValue="details" className="gap-4">
       <TabsList variant="line" className="w-full justify-start gap-8 border-b">
-        <TabsTrigger value="details" className="flex-none px-0 text-base">
+        <TabsTrigger value="details" className="flex-none px-0 text-17">
           Detalhes do NFT
         </TabsTrigger>
         {/* Fora do Radix: o Trigger desabilitado usa `disabled`, e a SPEC §13.5 pede aria-disabled. Fica fora do foco por não ter conteúdo. */}
@@ -40,7 +40,7 @@ export function NftInfo({ nft }: { nft: Nft }) {
           role="tab"
           aria-disabled="true"
           aria-selected="false"
-          className="cursor-not-allowed px-0 text-base text-foreground"
+          className="cursor-not-allowed px-0 text-17 text-foreground"
         >
           Avaliações de colecionadores ({nft.rating.count})
         </span>

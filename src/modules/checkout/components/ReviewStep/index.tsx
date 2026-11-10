@@ -293,7 +293,7 @@ function Review({
               const saved = readAttempt(userId)
               if (saved && connection.data) send(saved, connection.data.connectionId)
             }}
-            className="h-10 rounded-sm text-sm font-bold max-md:h-12 max-md:rounded-full"
+            className="h-10 rounded-sm text-15 font-bold max-md:h-12 max-md:rounded-full"
           >
             Tentar novamente
           </Button>
@@ -303,7 +303,7 @@ function Review({
             disabled={!canConfirm}
             aria-busy={busy || undefined}
             onClick={confirm}
-            className="h-10 rounded-sm text-sm font-bold max-md:h-12 max-md:rounded-full max-md:bg-linear-to-r max-md:from-primary max-md:to-[#A86D3D]"
+            className="h-10 rounded-sm text-15 font-bold max-md:h-12 max-md:rounded-full max-md:bg-linear-to-r max-md:from-primary max-md:to-[#A86D3D]"
           >
             Confirmar compra
           </Button>

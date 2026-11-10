@@ -53,15 +53,15 @@ describe('compare', () => {
 })
 
 describe('formatEth', () => {
-  it('formats in pt-BR with at least 2 decimal places', () => {
-    expect(formatEth('1.19')).toBe('1,19')
-    expect(formatEth('2')).toBe('2,00')
-    expect(formatEth('1234.5')).toBe('1.234,50')
+  it('formats with a decimal point and at least 2 decimal places', () => {
+    expect(formatEth('1.19')).toBe('1.19')
+    expect(formatEth('2')).toBe('2.00')
+    expect(formatEth('1234.5')).toBe('1,234.50')
   })
 
   it('rounds 18-place values to 6 places for display without float loss', () => {
-    expect(formatEth('1.000000000000000001')).toBe('1,00')
-    expect(formatEth('0.1234565')).toBe('0,123457')
-    expect(formatEth('9007199254740993.123456789')).toBe('9.007.199.254.740.993,123457')
+    expect(formatEth('1.000000000000000001')).toBe('1.00')
+    expect(formatEth('0.1234565')).toBe('0.123457')
+    expect(formatEth('9007199254740993.123456789')).toBe('9,007,199,254,740,993.123457')
   })
 })

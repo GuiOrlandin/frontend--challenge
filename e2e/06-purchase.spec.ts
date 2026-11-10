@@ -9,6 +9,10 @@ async function goToCheckout(page: Page) {
   await expect(page).toHaveURL(/\/carrinho$/)
   await page.getByRole('button', { name: 'Conectar e finalizar' }).click()
   await expect(page).toHaveURL(/\/pagamento/)
+  // No mobile os dados do comprador ficam recolhidos sob o ⋮ da Carteira (frame).
+  if (test.info().project.name === 'mobile') {
+    await page.getByRole('button', { name: 'Editar dados do comprador' }).click()
+  }
 }
 
 test.describe('pagamento: dados do comprador', () => {

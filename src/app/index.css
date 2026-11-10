@@ -41,6 +41,26 @@
   --font-mono: 'Roboto Mono', ui-monospace, monospace;
   --font-sans: var(--font-mono);
 
+  /* Tamanhos do Figma fora da escala padrão (xs 12, sm 14, base 16, lg 18, xl 20, 2xl 24). */
+  --text-9: 9px;
+  --text-9--line-height: 1.3;
+  --text-10: 10px;
+  --text-10--line-height: 1.4;
+  --text-13: 13px;
+  --text-13--line-height: 1.5;
+  --text-15: 15px;
+  --text-15--line-height: 1.5;
+  --text-17: 17px;
+  --text-17--line-height: 1.5;
+  --text-22: 22px;
+  --text-22--line-height: 1.3;
+  --text-28: 28px;
+  --text-28--line-height: 1.25;
+  --text-32: 32px;
+  --text-32--line-height: 1.25;
+  --text-43: 43px;
+  --text-43--line-height: 1.5;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

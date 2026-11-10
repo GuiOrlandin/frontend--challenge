@@ -25,7 +25,7 @@ export function CatalogTabs({ active }: CatalogTabsProps) {
               activeOptions={{ exact: true }}
               aria-current={tab.id === active ? 'page' : undefined}
               className={cn(
-                'relative block py-1 text-sm transition-colors hover:text-primary',
+                'relative block py-1 text-sm transition lg:text-15-colors hover:text-primary',
                 tab.id === active &&
                   'font-medium text-primary after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary',
               )}

@@ -1,9 +1,12 @@
+import { useLocation } from '@tanstack/react-router'
+
 import FacebookIcon from '@/assets/icons/facebook.svg?react'
 import InstagramIcon from '@/assets/icons/instagram.svg?react'
 import LinkedinIcon from '@/assets/icons/linkedin.svg?react'
 import TwitterIcon from '@/assets/icons/twitter.svg?react'
 import YoutubeIcon from '@/assets/icons/youtube.svg?react'
 import { PageContainer } from '@/shared/components/PageContainer'
+import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 
@@ -54,8 +57,15 @@ const SOCIALS = [
 ]
 
 export function Footer() {
+  const { pathname } = useLocation()
   return (
-    <footer className="mt-16 pb-24 md:pb-0">
+    // Mobile: detalhe, carrinho e pagamento ficam em tela cheia, sem rodapé (frames mobile).
+    <footer
+      className={cn(
+        'mt-16 pb-24 md:pb-0',
+        /^\/(nft\/|carrinho|pagamento)/.test(pathname) && 'max-md:hidden',
+      )}
+    >
       <PageContainer>
         <div className="grid gap-8 rounded-t-lg bg-card p-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:p-8">
           {FEATURES.map(({ letter, title, text }) => (
@@ -69,14 +79,14 @@ export function Footer() {
               >
                 {letter}
               </span>
-              <h2 className="text-sm font-bold lg:text-[17px] lg:whitespace-nowrap">{title}</h2>
+              <h2 className="text-sm font-bold lg:text-17 lg:whitespace-nowrap">{title}</h2>
               <p className="text-xs leading-relaxed text-option lg:max-w-[190px] lg:text-sm">
                 {text}
               </p>
             </div>
           ))}
           <div className="flex flex-col gap-3 lg:pl-4">
-            <h2 className="text-sm font-bold lg:text-[17px] lg:leading-tight">
+            <h2 className="text-sm font-bold lg:text-lg lg:leading-tight">
               Antecipe-se ao próximo lançamento
             </h2>
             <div className="flex">
@@ -89,12 +99,12 @@ export function Footer() {
               />
               <Button
                 aria-disabled="true"
-                className="h-8 shrink-0 rounded-l-none lg:h-10 lg:px-2.5"
+                className="h-8 shrink-0 rounded-l-none lg:h-10 lg:px-2.5 lg:text-lg"
               >
                 Enviar
               </Button>
             </div>
-            <p className="text-xs leading-relaxed text-option lg:text-sm">
+            <p className="text-xs leading-relaxed text-option lg:text-13">
               Receba lançamentos selecionados, histórias de criadores e novidades do mercado.
             </p>
           </div>
@@ -134,7 +144,7 @@ export function Footer() {
               ))}
             </ul>
             <h2 className="mt-6 mb-3 text-sm font-bold lg:text-lg">Carteiras compatíveis</h2>
-            <p className="inline-block rounded-sm bg-accent px-3 py-1.5 text-[9px] font-bold tracking-wide text-primary">
+            <p className="inline-block rounded-sm bg-accent px-3 py-1.5 text-9 font-bold tracking-wide text-primary">
               METAMASK · WALLETCONNECT · COINBASE
             </p>
           </div>
