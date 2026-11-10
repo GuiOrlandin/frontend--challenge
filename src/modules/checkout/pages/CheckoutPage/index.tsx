@@ -18,6 +18,7 @@ import {
 } from '@/shared/ui/breadcrumb'
 
 import { BuyerForm } from '../../components/BuyerForm'
+import { ReviewStep } from '../../components/ReviewStep'
 
 /** `/pagamento?step=` (SPEC §8.1). Carrinho, Perfil e Carteiras já vêm do loader. */
 export function CheckoutPage() {
@@ -83,13 +84,7 @@ export function CheckoutPage() {
           }
         />
       ) : step === 'revisao' ? (
-        // Provisória (task 35): a revisão cria a Cotação e a Conexão.
-        <div className="flex flex-col items-start gap-4">
-          <h2 className="font-bold">Revisão</h2>
-          <Link to="/pagamento" search={{ step: 'dados' }} className="text-sm text-primary">
-            Voltar aos dados
-          </Link>
-        </div>
+        <ReviewStep userId={userId} wallets={wallets} cart={cart} />
       ) : (
         <BuyerForm userId={userId} profile={profile} wallets={wallets} cart={cart} />
       )}

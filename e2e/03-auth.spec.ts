@@ -76,6 +76,34 @@ test('session-expired ao navegar para uma página privada pede login e volta par
   await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
 })
 
+test('session-expired durante o checkout pede login e volta ao pagamento', async ({
+  page,
+  loginAs,
+  mock,
+}) => {
+  await loginAs('ana')
+  await page.goto('/nft/nft_001')
+  await page.getByRole('button', { name: 'Comprar' }).click()
+  await page.getByRole('button', { name: 'Conectar e finalizar' }).click()
+  await page.getByRole('button', { name: 'Continuar' }).click()
+  await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeEnabled()
+
+  await mock.expireSession()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
+
+  await expect(page.getByText('Sua sessão expirou, entre novamente')).toBeVisible()
+  const dialog = page.getByRole('dialog', { name: 'Entrar' })
+  await expect(dialog).toBeVisible()
+  await expect(page).toHaveURL(/redirect=%2Fpagamento/)
+
+  await dialog.getByLabel('E-mail').fill(USERS.ana)
+  await dialog.getByLabel('Senha', { exact: true }).fill(PASSWORD)
+  await dialog.getByRole('button', { name: 'Entrar', exact: true }).click()
+  // O logout apaga o rascunho: a revisão devolve para os dados, já preenchidos pela Carteira.
+  await expect(page).toHaveURL(/\/pagamento\?step=dados$/)
+  await expect(page.getByLabel('Nome de exibição')).toHaveValue('Ana Ribeiro')
+})
+
 test('logout volta para o início como Visitante', async ({ page, loginAs, isMobile }) => {
   await loginAs('ana')
   if (isMobile) {
