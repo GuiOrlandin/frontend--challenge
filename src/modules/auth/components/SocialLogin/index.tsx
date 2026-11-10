@@ -6,26 +6,26 @@ import { Button } from '@/shared/ui/button'
 export function SocialLogin() {
   return (
     <div className="grid gap-3">
-      {/* Mobile: traços dos lados; desktop: divisor de borda a borda do modal, texto abaixo. */}
-      <p className="flex items-center justify-center gap-3 text-xs text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border lg:-mx-14 lg:border-t lg:pt-4 lg:before:hidden lg:after:hidden">
+      {/* Traços dos lados do texto; no desktop vão de borda a borda do modal. */}
+      <p className="flex items-center justify-center gap-3 text-sm before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border lg:-mx-14">
         Ou continue com
       </p>
       <Button
         type="button"
         variant="outline"
         aria-disabled="true"
-        className="h-10 text-xs font-normal"
+        className="h-10 gap-3 text-sm font-normal text-option dark:bg-transparent"
       >
-        <GoogleIcon className="size-4" />
+        <GoogleIcon className="size-5" />
         Continuar com Google
       </Button>
       <Button
         type="button"
         variant="outline"
         aria-disabled="true"
-        className="h-10 text-xs font-normal"
+        className="h-10 gap-3 text-sm font-normal text-option dark:bg-transparent"
       >
-        <FacebookIcon className="size-4" />
+        <FacebookIcon className="size-5" />
         Continuar com Facebook
       </Button>
     </div>

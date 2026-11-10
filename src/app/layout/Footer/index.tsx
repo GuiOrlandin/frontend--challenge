@@ -61,39 +61,46 @@ export function Footer() {
           {FEATURES.map(({ letter, title, text }) => (
             <div
               key={title}
-              className="flex flex-col gap-2 lg:border-r lg:border-primary/40 lg:pr-6 lg:pl-6 lg:first:pl-0"
+              className="flex flex-col gap-2 lg:border-r lg:border-primary/40 lg:pr-3 lg:pl-4 lg:first:pl-0"
             >
               <span
                 aria-hidden="true"
-                className="mb-2 flex size-10 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground"
+                className="mb-2 flex size-10 items-center justify-center rounded-full bg-primary font-bold lg:size-[74px] lg:text-2xl text-primary-foreground"
               >
                 {letter}
               </span>
-              <h2 className="text-sm font-bold">{title}</h2>
-              <p className="text-xs leading-relaxed text-muted-foreground">{text}</p>
+              <h2 className="text-sm font-bold lg:text-[17px] lg:whitespace-nowrap">{title}</h2>
+              <p className="text-xs leading-relaxed text-option lg:max-w-[190px] lg:text-sm">
+                {text}
+              </p>
             </div>
           ))}
-          <div className="flex flex-col gap-3 lg:pl-6">
-            <h2 className="text-sm font-bold">Antecipe-se ao próximo lançamento</h2>
+          <div className="flex flex-col gap-3 lg:pl-4">
+            <h2 className="text-sm font-bold lg:text-[17px] lg:leading-tight">
+              Antecipe-se ao próximo lançamento
+            </h2>
             <div className="flex">
               <Input
                 aria-label="E-mail para novidades"
                 placeholder="digite seu e-mail..."
                 readOnly
                 aria-disabled="true"
-                className="h-8 rounded-r-none border-0 bg-accent text-xs"
+                className="h-8 w-[185px] shrink-0 lg:h-10 rounded-r-none border-0 bg-accent px-2 text-sm"
               />
-              <Button aria-disabled="true" className="h-8 rounded-l-none">
+              <Button
+                aria-disabled="true"
+                className="h-8 shrink-0 rounded-l-none lg:h-10 lg:px-2.5"
+              >
                 Enviar
               </Button>
             </div>
-            <p className="text-xs leading-relaxed text-muted-foreground">
+            <p className="text-xs leading-relaxed text-option lg:text-sm">
               Receba lançamentos selecionados, histórias de criadores e novidades do mercado.
             </p>
           </div>
         </div>
 
-        <div className="grid gap-2 bg-footer-band px-6 py-5 text-xs sm:grid-cols-2 lg:grid-cols-4 lg:items-center lg:px-8">
+        <div className="grid gap-2 bg-footer-band px-6 py-5 text-xs sm:grid-cols-2 lg:text-sm lg:grid-cols-4 lg:items-center lg:px-8">
           <span className="font-bold tracking-widest">KURIO</span>
           <span>Feito para colecionadores, criadores e cultura</span>
           <span>contato@email.com</span>
@@ -103,8 +110,8 @@ export function Footer() {
         <div className="grid gap-8 rounded-b-lg bg-card p-6 sm:grid-cols-2 lg:grid-cols-4 lg:p-8">
           {COLUMNS.map(({ title, items }) => (
             <div key={title}>
-              <h2 className="mb-3 text-sm font-bold">{title}</h2>
-              <ul className="flex flex-col gap-2 text-xs">
+              <h2 className="mb-3 text-sm font-bold lg:text-lg">{title}</h2>
+              <ul className="flex flex-col gap-2 text-xs lg:text-sm">
                 {items.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -112,7 +119,7 @@ export function Footer() {
             </div>
           ))}
           <div>
-            <h2 className="mb-3 text-sm font-bold">Redes sociais</h2>
+            <h2 className="mb-3 text-sm font-bold lg:text-lg">Redes sociais</h2>
             <ul className="flex gap-2">
               {SOCIALS.map(({ label, Icon }) => (
                 <li key={label}>
@@ -126,14 +133,16 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-            <h2 className="mt-6 mb-3 text-sm font-bold">Carteiras compatíveis</h2>
-            <p className="inline-block rounded-sm bg-accent px-3 py-1.5 text-xs font-bold tracking-wide text-primary">
+            <h2 className="mt-6 mb-3 text-sm font-bold lg:text-lg">Carteiras compatíveis</h2>
+            <p className="inline-block rounded-sm bg-accent px-3 py-1.5 text-[9px] font-bold tracking-wide text-primary">
               METAMASK · WALLETCONNECT · COINBASE
             </p>
           </div>
         </div>
 
-        <p className="py-6 text-center text-xs">© 2026 Kurio. Propriedade digital para todos.</p>
+        <p className="py-6 text-center text-xs lg:text-sm">
+          © 2026 Kurio. Propriedade digital para todos.
+        </p>
       </PageContainer>
     </footer>
   )

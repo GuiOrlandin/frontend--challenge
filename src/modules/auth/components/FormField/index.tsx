@@ -7,7 +7,7 @@ import { Label } from '@/shared/ui/label'
 import type { FormFieldProps } from './types'
 
 const inputClass =
-  'h-12 rounded-md bg-transparent px-4 text-xs placeholder:text-primary/70 md:text-xs lg:h-10 dark:bg-transparent'
+  'h-12 rounded-md bg-transparent px-4 text-sm placeholder:text-[#B39463] md:text-sm lg:h-10 dark:bg-transparent'
 
 /** Campo do Figma: só o placeholder à vista, rótulo para leitores de tela, erro associado. */
 export function FormField({ label, error, type = 'text', ...props }: FormFieldProps) {

@@ -36,7 +36,7 @@ export function AuthDialog() {
       <DialogContent
         className={cn(
           'inset-0 top-0 left-0 flex h-dvh max-w-none translate-x-0 translate-y-0 flex-col gap-8 overflow-y-auto rounded-none border-0 bg-background px-7 py-16 sm:max-w-none',
-          'lg:inset-auto lg:top-1/2 lg:left-1/2 lg:h-auto lg:min-h-[600px] lg:overflow-x-hidden lg:max-h-[calc(100dvh-2rem)] lg:justify-center lg:w-[500px] lg:max-w-[500px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:gap-6 lg:rounded-md lg:border lg:border-primary/40 lg:bg-card lg:px-14 lg:py-10',
+          'lg:inset-auto lg:top-1/2 lg:left-1/2 lg:h-auto lg:min-h-[600px] lg:overflow-x-hidden lg:max-h-[calc(100dvh-2rem)] lg:justify-center lg:w-[500px] lg:max-w-[500px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:gap-6 lg:border-b-[10px] lg:border-b-primary lg:bg-card lg:px-14 lg:py-10',
         )}
       >
         <header className="grid gap-4 text-center">
@@ -47,7 +47,7 @@ export function AuthDialog() {
           {/* Abas do desktop: mesmo destino do link "Crie uma conta" do mobile. */}
           <nav
             aria-label="Acesso"
-            className="hidden items-center justify-center gap-2 text-sm lg:flex"
+            className="hidden items-center justify-center gap-2 text-xl lg:flex"
           >
             <Link
               to="."
@@ -57,7 +57,7 @@ export function AuthDialog() {
             >
               Entrar
             </Link>
-            <span aria-hidden="true" className="h-4 w-px bg-primary" />
+            <span aria-hidden="true" className="h-5 w-px bg-primary" />
             <Link
               to="."
               search={(prev) => ({ ...prev, auth: 'cadastro' as const })}
@@ -67,7 +67,7 @@ export function AuthDialog() {
               Criar conta
             </Link>
           </nav>
-          <DialogDescription className="text-xs max-lg:sr-only">
+          <DialogDescription className="text-[13px] max-lg:sr-only">
             {isLogin
               ? 'Entre para gerenciar sua carteira, coleção e perfil de criador.'
               : 'Crie seu perfil de colecionador e conecte uma carteira quando quiser.'}

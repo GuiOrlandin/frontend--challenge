@@ -28,7 +28,7 @@ export function LoginForm() {
           error={fieldErrors.password}
         />
         {/* Estático (SPEC §1). */}
-        <span className="justify-self-end text-xs text-primary">Esqueceu a senha?</span>
+        <span className="justify-self-end text-sm text-primary">Esqueceu a senha?</span>
       </div>
       {formError && (
         <p role="alert" className="text-xs text-destructive">
@@ -39,7 +39,7 @@ export function LoginForm() {
         type="submit"
         aria-busy={pending}
         disabled={pending}
-        className="mt-4 h-12 rounded-md lg:h-11"
+        className="mt-4 h-12 rounded-md text-base font-bold lg:h-11"
       >
         Entrar
       </Button>
