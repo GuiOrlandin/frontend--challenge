@@ -12,3 +12,10 @@ export const rootSearchSchema = z.object({
 })
 
 export type RootSearch = z.infer<typeof rootSearchSchema>
+
+/** Passos do pagamento (SPEC §4.2, §8.1): `/pagamento?step=`. */
+export const CHECKOUT_STEPS = ['dados', 'revisao'] as const
+
+export const checkoutSearchSchema = z.object({
+  step: z.enum(CHECKOUT_STEPS).default('dados').catch('dados'),
+})

@@ -2,6 +2,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { type FormEvent, useId, useState } from 'react'
 import { toast } from 'sonner'
 
+import { EnsField } from '@/shared/components/EnsField'
+import { Field } from '@/shared/components/Field'
 import { changePasswordSchema, isApiError, profileSchema } from '@/shared/contracts'
 import { withEnsSuffix } from '@/shared/lib/ens'
 import { type FieldErrors, fieldErrorsOf, focusFirstInvalid } from '@/shared/lib/form'
@@ -10,8 +12,6 @@ import { Button } from '@/shared/ui/button'
 import { changePassword, updateProfile } from '../../api'
 import { saveProfile } from '../../queries'
 import { AvatarField } from '../AvatarField'
-import { EnsField } from '../EnsField'
-import { Field } from '../Field'
 import type { ProfileFormProps } from './types'
 
 const PASSWORD_KEYS = ['currentPassword', 'newPassword', 'confirmPassword'] as const

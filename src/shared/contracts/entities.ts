@@ -9,6 +9,17 @@ export type Network = (typeof NETWORKS)[number]
 export const WALLET_PROVIDERS = ['metamask', 'walletconnect', 'coinbase'] as const
 export type WalletProvider = (typeof WALLET_PROVIDERS)[number]
 
+export const NETWORK_LABELS: Record<Network, string> = {
+  ethereum: 'Ethereum',
+  polygon: 'Polygon',
+  solana: 'Solana',
+}
+export const WALLET_PROVIDER_LABELS: Record<WalletProvider, string> = {
+  metamask: 'MetaMask',
+  walletconnect: 'WalletConnect',
+  coinbase: 'Coinbase Wallet',
+}
+
 export const WALLET_ROLES = ['primary', 'secondary'] as const
 export type WalletRole = (typeof WALLET_ROLES)[number]
 

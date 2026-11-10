@@ -3,11 +3,14 @@ import { type FormEvent, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { toast } from 'sonner'
 
+import { EnsField } from '@/shared/components/EnsField'
+import { Field } from '@/shared/components/Field'
+import { SelectField } from '@/shared/components/SelectField'
 import {
   isApiError,
-  type Network,
+  NETWORK_LABELS,
+  WALLET_PROVIDER_LABELS,
   type WalletInput,
-  type WalletProvider,
   walletSchema,
 } from '@/shared/contracts'
 import { withEnsSuffix } from '@/shared/lib/ens'
@@ -16,21 +19,10 @@ import { Button } from '@/shared/ui/button'
 
 import { createWallet, updateWallet } from '../../api'
 import { saveWallet } from '../../queries'
-import { EnsField } from '../EnsField'
-import { Field } from '../Field'
-import { SelectField } from '../SelectField'
 import type { WalletFormProps } from './types'
 
-const NETWORK_OPTIONS: [Network, string][] = [
-  ['ethereum', 'Ethereum'],
-  ['polygon', 'Polygon'],
-  ['solana', 'Solana'],
-]
-const PROVIDER_OPTIONS: [WalletProvider, string][] = [
-  ['metamask', 'MetaMask'],
-  ['walletconnect', 'WalletConnect'],
-  ['coinbase', 'Coinbase Wallet'],
-]
+const NETWORK_OPTIONS = Object.entries(NETWORK_LABELS)
+const PROVIDER_OPTIONS = Object.entries(WALLET_PROVIDER_LABELS)
 
 /**
  * Cadastro ou edição de uma Carteira (SPEC §9). Rede × Endereço valida no cliente; Apelido e

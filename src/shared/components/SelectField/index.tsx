@@ -9,7 +9,16 @@ import type { SelectFieldProps } from './types'
  * Select obrigatório no formato do `Field`. O Radix envia o valor num `<select>` nativo oculto;
  * o foco do erro vai para o gatilho, que leva o `aria-invalid`.
  */
-export function SelectField({ name, label, options, defaultValue, error }: SelectFieldProps) {
+export function SelectField({
+  name,
+  label,
+  options,
+  defaultValue,
+  value,
+  onValueChange,
+  disabled,
+  error,
+}: SelectFieldProps) {
   const id = useId()
   const errorId = `${id}-erro`
 
@@ -21,7 +30,13 @@ export function SelectField({ name, label, options, defaultValue, error }: Selec
           *
         </span>
       </Label>
-      <Select name={name} defaultValue={defaultValue}>
+      <Select
+        name={name}
+        defaultValue={defaultValue}
+        value={value}
+        onValueChange={onValueChange}
+        disabled={disabled}
+      >
         <SelectTrigger
           id={id}
           aria-required
