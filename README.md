@@ -2,7 +2,7 @@
 
 Marketplace de NFTs em React e TypeScript: catálogo, detalhe, carrinho, pagamento, confirmação de pedido, login, cadastro, perfil e carteiras, em desktop, tablet e mobile. A API REST e os eventos Socket.IO são simulados com MSW na camada de rede; nada depende de backend real, blockchain ou gateway de pagamento.
 
-- **Deploy**: _URL pública a preencher após o deploy na Vercel_ (build de demo com os mocks ligados).
+- **Deploy**: https://frontend-challenge-rouge.vercel.app (build de demo com os mocks ligados).
 - **Enunciado do desafio**: [`docs/CHALLENGE.md`](docs/CHALLENGE.md).
 - **Arquitetura, contratos e decisões**: [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
@@ -72,6 +72,8 @@ Cadastrar com `ana@kurio.dev` ou com o usuário `ana` gera o conflito de cadastr
 
 O cenário vem de `?scenario=<nome>` em qualquer URL, fica guardado em `localStorage` (sobrevive a refresh) e troca o banco para a seed dele. O bootstrap remove o parâmetro da URL depois de aplicar.
 
+> **Para sair de um cenário** (principalmente `offline`, em que nada carrega), abra `/?scenario=default`, por exemplo https://frontend-challenge-rouge.vercel.app/?scenario=default. Também funciona `__mock.scenario('default')` no console ou apagar a chave `kurio-mock-scenario` do `localStorage`.
+
 As URLs abaixo usam o `pnpm dev`; no deploy, troque a origem pela URL pública.
 
 | Cenário | Efeito | URL |
@@ -80,7 +82,7 @@ As URLs abaixo usam o `pnpm dev`; no deploy, troque a origem pela URL pública.
 | `empty` | Catálogo vazio | http://localhost:5173/?scenario=empty |
 | `slow` | Latência de 1,5 a 3 s (skeletons visíveis) | http://localhost:5173/?scenario=slow |
 | `flaky` | As 2 primeiras buscas do catálogo respondem 503, depois funciona | http://localhost:5173/?scenario=flaky |
-| `offline` | Toda chamada falha por rede e o socket não conecta | http://localhost:5173/?scenario=offline |
+| `offline` | Toda chamada falha por rede e o socket não conecta. Fica ativo até abrir `?scenario=default` | http://localhost:5173/?scenario=offline |
 | `out-of-order` | Buscas mais antigas respondem depois das mais novas | http://localhost:5173/?scenario=out-of-order |
 | `session-expired` | A sessão expira na próxima chamada privada | http://localhost:5173/?scenario=session-expired |
 | `payment-refused` | O pedido termina recusado (pagamento recusado) | http://localhost:5173/?scenario=payment-refused |
@@ -106,6 +108,18 @@ __mock.failNext({ method: 'PUT', path: '/me/favorites' }, 1)  // próxima chamad
 ```
 
 As requisições REST aparecem na aba Network; o Socket.IO mockado não aparece lá (use os logs do MSW no console).
+
+### Testando o tempo real no deploy
+
+O Socket.IO do deploy também é o mock (roda no navegador). Para ver um `nft.updated` chegar sem recarregar:
+
+1. Abra https://frontend-challenge-rouge.vercel.app/nft/nft_001?scenario=price-change (troca o cenário e reseta o banco).
+2. Entre como Ana e adicione o NFT ao carrinho.
+3. Abra o carrinho e espere 4 s: a linha é destacada com o preço 10% maior e o resumo atualiza.
+
+Os eventos aparecem nos logs do MSW no console. Para voltar ao normal: https://frontend-challenge-rouge.vercel.app/?scenario=default
+
+Teste em uma guia só: cada guia roda o próprio mock, então um evento disparado em uma não chega à outra. Os dados do mock ficam no `localStorage` e aparecem na outra guia só depois de recarregá-la. Só login e logout sincronizam na hora. Com um backend real, todas as guias receberiam o evento.
 
 ## Reproduzindo os fluxos de falha
 
