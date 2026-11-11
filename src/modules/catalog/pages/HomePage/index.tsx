@@ -45,18 +45,19 @@ export function HomePage() {
 
   return (
     // pb-8 + mt-16 do footer = 96 px até o rodapé (Figma).
-    <PageContainer className="flex flex-col gap-6 py-4 lg:pt-8 lg:pb-8">
+    // Mobile (Figma): busca a 40 px do topo e 16 px entre busca, hero e abas.
+    <PageContainer className="flex flex-col gap-4 pt-10 pb-4 lg:gap-6 lg:pt-8 lg:pb-8">
       {/* Abaixo de `lg`: busca e filtros no topo (frame mobile). No desktop, a busca é a do header. */}
-      <div className="flex items-center gap-3 lg:hidden">
+      <div className="flex items-center gap-2 lg:hidden">
         <CatalogSearch q={search.q} onSearch={onSearch} />
         <Sheet open={filtersOpen} onOpenChange={onFiltersOpenChange}>
           <button
             type="button"
             aria-label="Abrir filtros"
             onClick={() => onFiltersOpenChange(true)}
-            className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
+            className="flex size-[45px] shrink-0 items-center justify-center rounded-[14px] bg-[linear-gradient(137deg,rgb(210_138_76/0.45)_24.6%,#D28A4C_100%)] text-primary-foreground focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
           >
-            <SlidersIcon className="size-5" />
+            <SlidersIcon />
           </button>
           <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto rounded-t-3xl">
             <SheetHeader>
@@ -104,7 +105,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <div className="mt-10 flex flex-col gap-16 lg:mt-18 lg:gap-24">
+      <div className="mt-12 flex flex-col gap-16 lg:mt-18 lg:gap-24">
         <PromoBanners />
         <MintJournal />
       </div>

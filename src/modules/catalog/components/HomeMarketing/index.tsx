@@ -44,7 +44,11 @@ export function PromoBanners() {
             <h2 className="text-base font-bold lg:text-lg">{banner.title}</h2>
             <p className="text-xs leading-relaxed text-primary lg:text-sm">{banner.text}</p>
             <Button asChild size="lg" className="mt-auto">
-              <Link to="/" hash="catalogo">
+              <Link
+                to="/"
+                hash="catalogo"
+                onClick={() => document.getElementById('catalogo')?.scrollIntoView()}
+              >
                 Explorar <ArrowExploreIcon className="h-2.5 w-3" />
               </Link>
             </Button>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import SearchIcon from '@/assets/icons/search.svg?react'
+import SearchIcon from '@/assets/icons/search-bold.svg?react'
 import { Input } from '@/shared/ui/input'
 
 import type { CatalogSearchProps } from './types'
@@ -29,14 +29,15 @@ export function CatalogSearch({ q, onSearch }: CatalogSearchProps) {
 
   return (
     <div role="search" className="relative flex-1">
-      <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted-foreground" />
+      <SearchIcon className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[#B39463]" />
+      {/* Texto digitado fica em 16 px: abaixo disso o iOS dá zoom no foco. Placeholder no Body/14 Bold do Figma. */}
       <Input
         type="search"
         aria-label="Buscar no catálogo"
         placeholder="Explorar coleções"
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
-        className="h-11 rounded-lg border-none bg-card pl-10"
+        className="h-[45px] rounded-[10px] border-none bg-card pl-[42px] placeholder:text-sm placeholder:font-bold placeholder:text-[#B39463]"
       />
     </div>
   )

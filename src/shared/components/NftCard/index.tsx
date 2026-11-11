@@ -31,7 +31,7 @@ export function NftCard({ nft, actions, priority = false, size = 'md' }: NftCard
         )}
         {/* Com mouse, só aparecem no hover/foco do card; no toque ficam sempre visíveis. Mobile: canto superior direito (frame). */}
         {actions && (
-          <div className="absolute top-2 right-2 z-10 flex justify-center gap-2 transition-opacity lg:inset-x-0 lg:top-auto lg:right-auto lg:bottom-2.5 pointer-fine:opacity-0 pointer-fine:group-focus-within:opacity-100 pointer-fine:group-hover:opacity-100">
+          <div className="absolute top-2 right-2 z-10 flex justify-center gap-2 transition-opacity lg:inset-x-0 lg:top-auto lg:bottom-2.5 pointer-fine:opacity-0 pointer-fine:group-focus-within:opacity-100 pointer-fine:group-hover:opacity-100">
             {actions}
           </div>
         )}

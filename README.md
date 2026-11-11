@@ -150,6 +150,22 @@ pnpm test:visual     # regressão visual (Docker)
 - Relatório HTML em `playwright-report/` (`pnpm exec playwright show-report`). Traces e screenshots das falhas em `test-results/` (`pnpm exec playwright show-trace <arquivo>.zip`).
 - As baselines visuais são geradas e comparadas só na imagem Docker, para não variar com fontes e renderização do sistema.
 
+### Rodando localmente: erros conhecidos
+
+- **`visual.spec.ts` falha fora do Docker.** As baselines são `*-linux.png`, renderizadas no Chromium da imagem `v1.65.0-noble`. No Windows ou no macOS, a fonte e o antialiasing mudam alguns pixels e todas as comparações falham. Não é regressão: rode `pnpm test:visual` (precisa do Docker). Depois de uma mudança visual intencional, `pnpm test:visual:update` regera as baselines, e o diff dos PNGs entra no commit.
+- **`--ui` e `--headed` incluem os visuais.** O `pnpm test:e2e` exclui `@visual`, mas `pnpm exec playwright test` sem filtro não exclui. No modo UI, digite `-@visual` no filtro da barra lateral, ou passe `--grep-invert @visual` na linha de comando.
+- **`http://localhost:4173 is already used`.** Algum `pnpm preview` ficou aberto (de outra rodada, do Lighthouse ou de um terminal). O Playwright sobe o próprio servidor e não reaproveita outro, para não testar um build antigo. Encerre o processo que está na porta 4173 e rode de novo.
+
+**Para ver os testes rodando:**
+
+```bash
+pnpm exec playwright test --ui                                # escolha os testes e veja o replay de cada passo
+pnpm test:e2e --headed --project=desktop e2e/06-purchase.spec.ts   # um spec com o Chrome visível, ao vivo
+pnpm test:e2e --debug -g "preço novo"                         # passo a passo com o inspector
+```
+
+No `--ui`, clique numa ação da lista para ver a tela naquele momento. A faixa de miniaturas no topo é a linha do tempo.
+
 ## Lighthouse
 
 ```bash

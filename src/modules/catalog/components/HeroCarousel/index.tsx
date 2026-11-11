@@ -65,6 +65,7 @@ export function HeroCarousel() {
           <Link
             to="/"
             hash="catalogo"
+            onClick={() => document.getElementById('catalogo')?.scrollIntoView()}
             className="flex items-center gap-2 self-start text-xs font-medium text-primary uppercase lg:hidden"
           >
             Explorar <ArrowExploreIcon className="h-2.5 w-3" />
@@ -74,7 +75,11 @@ export function HeroCarousel() {
             size="lg"
             className="mt-4 hidden self-start px-9 text-base uppercase lg:inline-flex"
           >
-            <Link to="/" hash="catalogo">
+            <Link
+              to="/"
+              hash="catalogo"
+              onClick={() => document.getElementById('catalogo')?.scrollIntoView()}
+            >
               Explorar
             </Link>
           </Button>

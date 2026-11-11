@@ -44,6 +44,8 @@ export function Header({ cart, account }: HeaderProps) {
             <Link
               to="/"
               hash="catalogo"
+              // O router ignora navegar para o mesmo hash; já na Início, rola na mão.
+              onClick={() => document.getElementById('catalogo')?.scrollIntoView()}
               className={navLinkClass(isMarket)}
               aria-current={isMarket ? 'page' : undefined}
             >
